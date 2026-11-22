@@ -1,0 +1,114 @@
+{
+  "name": "torqueforge",
+  "productName": "TorqueForge",
+  "version": "1.0.0",
+  "description": "Car builder and physics test track",
+  "main": "desktop/main.js",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "electron .",
+    "dist:linux": "electron-builder --linux AppImage deb rpm",
+    "dist:win": "electron-builder --win nsis portable",
+    "dist:mac": "electron-builder --mac zip --arm64 --x64"
+  },
+  "devDependencies": {
+    "@gltf-transform/cli": "^4.5.1",
+    "@gltf-transform/core": "^4.5.1",
+    "@gltf-transform/extensions": "^4.5.1",
+    "@gltf-transform/functions": "^4.5.1",
+    "electron": "45.4.1",
+    "electron-builder": "^26.0.0",
+    "meshoptimizer": "^0.25.0",
+    "peerjs": "^1.5.5",
+    "sharp": "^0.34.0"
+  },
+  "allowScripts": {
+    "electron@45.4.1": true,
+    "sharp@0.35.5": true,
+    "sharp@0.34.5": true,
+    "electron-winstaller@5.4.0": true
+  },
+  "dependencies": {
+    "draco3dgltf": "^1.5.9",
+    "three": "^0.170.0"
+  },
+  "build": {
+    "appId": "dev.torqueforge.app",
+    "productName": "TorqueForge",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "css/**",
+      "js/**",
+      "vendor/**",
+      "assets/env/**",
+      "assets/tex/**",
+      "assets/cars/index.json",
+      "assets/cars/CREDITS.md",
+      "assets/cars/*/high.glb",
+      "assets/cars/*/low.glb",
+      "assets/CREDITS.md",
+      "desktop/**",
+      "package.json"
+    ],
+    "asar": true,
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb",
+        "rpm"
+      ],
+      "category": "Game",
+      "maintainer": "croatianshrimp <croatianshrimp@users.noreply.github.com>",
+      "synopsis": "Car builder and physics test track",
+      "artifactName": "TorqueForge-${version}-linux-${arch}.${ext}"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "zip",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "category": "public.app-category.racing-games",
+      "identity": null,
+      "artifactName": "TorqueForge-${version}-mac-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "TorqueForge-${version}-Windows-portable.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "TorqueForge-${version}-Windows-Setup.exe"
+    }
+  },
+  "author": {
+    "name": "croatianshrimp",
+    "email": "croatianshrimp@users.noreply.github.com"
+  },
+  "homepage": "https://github.com/croatianshrimp/torqueforge",
+  "repository": "github:croatianshrimp/torqueforge"
+}

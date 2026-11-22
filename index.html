@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TorqueForge — Car Builder & Test Track</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏁</text></svg>">
+</head>
+<body>
+<header id="topbar">
+  <div class="logo">TORQUE<span>FORGE</span></div>
+  <nav>
+    <button data-view="build" class="active">🛠️ Build</button>
+    <button data-view="test">🏁 Test Track</button>
+    <button data-view="garage">🏠 My Builds</button>
+  </nav>
+  <div class="topright">
+    <div class="db-count" id="dbCount"></div>
+    <button id="gfxBtn" class="ghost" title="Graphics settings">⚙️ Graphics</button>
+    <div class="total"><small>Build total</small><b id="topTotal">$0</b></div>
+  </div>
+</header>
+
+<!-- ================= BUILD ================= -->
+<main id="view-build" class="view active">
+  <aside id="partsPanel">
+    <div id="carCard" class="card"></div>
+    <div id="partList"></div>
+  </aside>
+  <section id="viewerWrap">
+    <div id="viewer"></div>
+    <div class="viewer-tools">
+      <button id="paintBtn" class="ghost paint">🎨 Paint <i id="paintChip"></i></button>
+      <button id="spinBtn" class="ghost">⟳ Turntable</button>
+      <button id="tunnelBtn" class="ghost" title="Visualise airflow, drag and downforce">🌬️ Wind tunnel</button>
+      <button id="testBtn" class="cta">Test this build ▶</button>
+    </div>
+    <div id="buildName"><input id="nameInput" placeholder="Name your build…" maxlength="40"></div>
+    <div id="tuning" class="card">
+      <h4 id="tuneHead">Tuning <span class="tchev">▾</span><button id="tuneReset" class="ghost mini" title="Back to the default setup">Reset</button></h4>
+      <div id="tuneBody"></div>
+    </div>
+    <div id="tunnelHud" class="card hidden"></div>
+    <div id="paintShop" class="card hidden">
+      <div class="ps-head"><h4>🎨 Paint shop</h4><button id="paintReset" class="ghost mini" title="Back to the factory colour">Factory</button><button id="paintClose" class="ghost mini">✕</button></div>
+      <div class="ps-sec">Body colour <input type="color" id="paint" title="Custom colour"></div>
+      <div id="psBody" class="sw"></div>
+      <div class="ps-sec">Finish</div>
+      <div id="psFinish" class="chips"></div>
+      <div class="ps-sec">Stripes</div>
+      <div id="psStripes" class="chips"></div>
+      <div id="psStripeCol" class="sw small"></div>
+      <div class="ps-sec">Wheels</div>
+      <div id="psWheel" class="sw small"></div>
+    </div>
+  </section>
+  <aside id="statsPanel">
+    <div id="compat" class="card"></div>
+    <div id="price" class="card"></div>
+    <div id="specs" class="card"></div>
+    <div id="perf" class="card"></div>
+    <div class="card"><h4>Dyno <small>(crank, — stock)</small><button id="dynoBtn" class="mini">▶ Dyno run</button></h4><canvas id="dyno" width="320" height="170"></canvas></div>
+    <div class="row-btns">
+      <button id="saveBtn">💾 Save</button>
+      <button id="shareBtn">🔗 Share link</button>
+      <button id="resetBtn" class="ghost">Reset</button>
+    </div>
+  </aside>
+</main>
+
+<!-- ================= TEST ================= -->
+<main id="view-test" class="view">
+  <div id="testCanvas"></div>
+  <div id="hud">
+    <div id="hudTL" class="hudbox"></div>
+    <div id="hudTC"></div>
+    <canvas id="minimap" width="220" height="220"></canvas>
+    <div id="hudBR">
+      <div id="gear">N</div>
+      <div id="speed">0</div><div id="speedUnit">km/h</div>
+      <div id="rpmBar"><div id="rpmFill"></div><div id="rpmRed"></div></div>
+      <div id="rpmTxt">0 rpm</div>
+    </div>
+    <div id="timeslip" class="hudbox hidden"></div>
+    <div id="tree" class="hidden"><i></i><i></i><i></i><i class="g"></i></div>
+    <div id="msg"></div>
+    <div id="raceBoard" class="hudbox hidden"></div>
+    <div id="raceResults" class="hudbox hidden"></div>
+  </div>
+  <aside id="testPanel">
+    <h3 id="testCarName"></h3>
+    <label>Mode
+      <select id="mode">
+        <optgroup label="Single player">
+        <option value="circuit">Free drive</option>
+        <option value="attack">Time attack (medals)</option>
+        <option value="race">Race vs AI</option>
+        <option value="pace">Chase the pace car</option>
+        <option value="drag">Drag strip (¼ mile)</option>
+        </optgroup>
+        <optgroup label="Multiplayer">
+        <option value="online">Online with friends</option>
+        </optgroup>
+      </select>
+    </label>
+    <div id="rulesBox" class="subbox">
+      <div class="sub-h">Rules <small class="muted">— apply to races, time attack and online lobbies you host</small></div>
+      <label>Price limit <select id="ruleBudget"></select></label>
+      <label>Class limit <select id="ruleClass"></select></label>
+      <div id="ruleStatus"></div>
+    </div>
+    <div id="raceOpts" class="subbox hidden">
+      <label>Laps <select id="raceLaps"><option>1</option><option>2</option><option selected>3</option><option>5</option><option>10</option></select></label>
+      <label>Opponents <select id="raceAI"><option>1</option><option>3</option><option selected>5</option><option>7</option></select></label>
+      <label>AI skill <select id="raceSkill"><option value="0.86">Easy</option><option value="0.92" selected>Medium</option><option value="0.97">Hard</option><option value="1.01">Alien</option></select></label>
+    </div>
+    <div id="onlineBox" class="subbox hidden"></div>
+    <div id="paceOpts">
+      <label>Pace car <select id="rival"></select></label>
+      <label>Pace <span id="paceVal">85%</span><input type="range" id="pace" min="0.5" max="1.0" step="0.01" value="0.85"></label>
+    </div>
+    <label>Track <select id="trackSel"></select><small id="trackDesc" class="muted"></small></label>
+    <label>Weather <select id="weatherSel"><option value="dry">☀️ Dry</option><option value="wet">🌧️ Wet — rain (≈28% less grip)</option></select></label>
+    <label>Camera (C) <select id="camSel">
+      <option value="chase">Chase</option><option value="far">Chase — far</option><option value="cockpit">Cockpit</option>
+      <option value="hood">Hood</option><option value="bumper">Bumper</option><option value="tv">TV trackside</option><option value="heli">Helicopter</option>
+    </select></label>
+    <label>Wind <span id="windVal">0 km/h</span><input type="range" id="windSpd" min="0" max="80" step="1" value="0"></label>
+    <label>Wind from <span id="windDirVal">N</span><input type="range" id="windDir" min="0" max="359" step="1" value="0"></label>
+    <div class="checks">
+      <label><input type="checkbox" id="optTC" checked> Traction control</label>
+      <label><input type="checkbox" id="optABS" checked> ABS</label>
+      <label><input type="checkbox" id="optESC" checked> Stability control (ESC)</label>
+      <label><input type="checkbox" id="optAuto" checked> Automatic shifting</label>
+      <label><input type="checkbox" id="optMph"> MPH</label>
+      <label><input type="checkbox" id="optSound" checked> Sound</label>
+    </div>
+    <button id="restartBtn" class="cta">Restart (R)</button>
+    <div class="keys">
+      <b>Controls</b><br>
+      <span id="keysAuto">W / ↑ throttle · S / ↓ brake / reverse<br></span>
+      <span id="keysManual" class="hidden">↑ throttle · ↓ brake · W shift up · S shift down<br></span>
+      A D / ← → steer · Space handbrake<br>
+      C camera · R restart · Gamepad supported
+    </div>
+  </aside>
+</main>
+
+<!-- ================= GARAGE ================= -->
+<main id="view-garage" class="view">
+  <div class="garage-head"><h2>My Builds</h2><p>Saved in this browser. Share links work anywhere.</p></div>
+  <div id="garageList"></div>
+</main>
+
+<!-- ================= MODALS ================= -->
+<div id="picker" class="drawer hidden">
+  <div class="dr-head">
+    <div class="dr-title"><h3 id="pickTitle"></h3><div id="pickPI"></div><button class="close" data-close title="Close (Esc)">✕</button></div>
+    <div id="pickTabs" class="dr-tabs"></div>
+    <div class="dr-tools">
+      <input id="pickSearch" placeholder="Search parts…">
+      <span id="pickFilters"></span>
+      <select id="pickSort"><option value="perf">Best performance</option><option value="price">Price ↑</option><option value="-price">Price ↓</option><option value="name">Name</option></select>
+      <label class="chk"><input type="checkbox" id="pickCompat" checked> Compatible only</label>
+    </div>
+  </div>
+  <div id="pickNote"></div>
+  <div id="pickList"></div>
+  <div id="pickFoot"></div>
+</div>
+
+<div id="carPicker" class="modal hidden">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Choose a base car</h3>
+      <input id="carSearch" placeholder="Search make / model…">
+      <select id="carDrive"><option value="">All drivetrains</option><option>RWD</option><option>FWD</option><option>AWD</option></select>
+      <select id="carSort"><option value="price">Price ↑</option><option value="-price">Price ↓</option><option value="-hp">Power ↓</option><option value="make">Make</option><option value="line">Model line (generations)</option></select>
+      <button class="close" data-close>✕</button>
+    </div>
+    <div id="carGrid"></div>
+  </div>
+</div>
+
+<div id="convModal" class="modal hidden" style="z-index:80">
+  <div class="modal-box small conv-box">
+    <div class="modal-head"><h3 id="convTitle">Mount conversion needed</h3></div>
+    <div class="conv-body"><p id="convText"></p><ul id="convList"></ul><div id="convTotal" class="conv-total"></div></div>
+    <div class="conv-foot"><button id="convNo" class="ghost">Cancel</button><button id="convYes" class="cta">Install all</button></div>
+  </div>
+</div>
+<div id="dynoModal" class="modal hidden">
+  <div class="modal-box dyno-box">
+    <div class="modal-head"><h3>🏋️ Chassis dyno</h3><span id="dynoCar" class="muted"></span><span style="flex:1"></span>
+      <label class="muted" style="font-size:13px"><input type="checkbox" id="dynoSound" checked> Sound</label>
+      <button id="dynoGo" class="cta">▶ Start pull</button><button class="close" data-close>✕</button></div>
+    <div id="dynoOut"></div>
+    <div class="dyno-wrap"><canvas id="dynoBig"></canvas></div>
+    <div class="muted dyno-foot">Solid = your build, dashed = stock. Pull is in a 1:1 gear like a real chassis dyno; wheel hp uses a typical driveline loss for the layout.</div>
+  </div>
+</div>
+<div id="gfxModal" class="modal hidden">
+  <div class="modal-box small">
+    <div class="modal-head"><h3>Graphics</h3><span id="gpuName" class="muted"></span><span style="flex:1"></span><button class="close" data-close>✕</button></div>
+    <div class="gfx-body">
+      <div class="gfx-presets" id="gfxPresets"></div>
+      <p class="muted" id="gfxPresetNote"></p>
+      <label class="gfx-row">Render scale <input type="range" id="gfxScale" min="0.5" max="1.5" step="0.05"><b id="gfxScaleVal"></b></label>
+      <label class="gfx-row">Frame-rate cap <select id="gfxCap"><option value="0">Off (match display)</option><option value="30">30</option><option value="60">60</option><option value="120">120</option><option value="144">144</option><option value="165">165</option><option value="240">240</option></select></label>
+      <label class="gfx-row"><span>Dynamic resolution <small class="muted">— lowers render scale briefly to hold the frame-rate target</small></span><input type="checkbox" id="gfxDyn"></label>
+      <label class="gfx-row"><span>Show FPS counter</span><input type="checkbox" id="gfxFps"></label>
+      <label class="gfx-row" id="vsyncRow" hidden><span>Uncapped frame rate (VSync off) <small class="muted">— desktop app only, restarts the app</small></span><input type="checkbox" id="gfxVsync"></label>
+      <h4>Car model credits</h4>
+      <div id="credits" class="credits"></div>
+    </div>
+  </div>
+</div>
+
+<div id="fps" style="display:none"></div>
+<div id="loading" class="hidden"><div class="spinner"></div><span>Loading car…</span></div>
+<div id="toast"></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

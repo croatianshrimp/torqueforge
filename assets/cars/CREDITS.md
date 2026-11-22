@@ -1,0 +1,84 @@
+# Car model credits
+
+Downloaded from Sketchfab; each model belongs to its author and is used under the licence shown. Models were scaled, re-oriented, simplified and had their wheels replaced for use in TorqueForge.
+
+- **944t**: “1991 Porsche 944 Turbo” by DisneyCars — CC Attribution — https://sketchfab.com/3d-models/1991-porsche-944-turbo-570249cd14c342ea947b05fee05245d9
+- **a70**: “1987 Toyota Supra Turbo” by tonielpro520 — CC Attribution — https://sketchfab.com/3d-models/1987-toyota-supra-turbo-f3cb2d62134144c6b8bec82514f97d08
+- **a80**: “TOYOTA SUPRA MK4 (A80)” by temich — CC Attribution-NonCommercial — https://sketchfab.com/3d-models/toyota-supra-mk4-a80-61d402d6de904374bfe5a98907c85b1d
+- **a90**: “2020 Toyota GR Supra” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2020-toyota-gr-supra-4b829105275f4e06a824fad6d1eaf259
+- **ae86**: “Toyota AE86 Sprinter Trueno Zenki” by Martin Trafas — CC Attribution — https://sketchfab.com/3d-models/toyota-ae86-sprinter-trueno-zenki-a5737bf3cc9b4179a6e5ebe173ff70d9
+- **brz_zc6**: “2013 Subaru BRZ” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2013-subaru-brz-9619c092b4dd496a978dee79194da288
+- **c5z06**: “Chevrolet Corvette C5 (Blue)” by Randomness — CC Attribution — https://sketchfab.com/3d-models/chevrolet-corvette-c5-blue-283f9ddde44f4caeacb544d4057dcd3d
+- **c6z06**: “2013 Chevrolet Corvette Z06” by Ddiaz Design — CC Attribution — https://sketchfab.com/3d-models/2013-chevrolet-corvette-z06-a0a8832577594c13b8626fa9069885d2
+- **c7z06**: “2015 Chevrolet Corvette C7 Z06” by XENVOR creations — CC Attribution — https://sketchfab.com/3d-models/2015-chevrolet-corvette-c7-z06-729fc2a2dccd4ea1b098da30536880f9
+- **c8**: “2019 Chevrolet Corvette C8 Stingray” by Hari Prasath R — CC Attribution — https://sketchfab.com/3d-models/2019-chevrolet-corvette-c8-stingray-790c40ccff6843eab0b7b4bd18421ff8
+- **camaro5**: “2010 Chevrolet Camaro SS” by Galaxy Car Showroom — CC Attribution — https://sketchfab.com/3d-models/2010-chevrolet-camaro-ss-b2845536739542e1a4493a192990f91b
+- **camaro69**: “Chevrolet Camaro - SS 1969” by GastonDou1 — CC Attribution — https://sketchfab.com/3d-models/chevrolet-camaro-ss-1969-c58b2066d136450e9593eb747a72ac85
+- **camaro_ss**: “2017 Chevrolet Camaro SS” by OUTPISTON — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2017-chevrolet-camaro-ss-7e7d5537cf3048ae874fc9af23c28c44
+- **dc2**: “1998 Honda Integra Type R DC2” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/1998-honda-integra-type-r-dc2-db88d2cc21654a4eb73ec9f0c2a7e113
+- **dc5**: “2001 Honda Integra Type-R (DC5)” by 007 — CC Attribution — https://sketchfab.com/3d-models/2001-honda-integra-type-r-dc5-5ea7a900615c4e38998b73e05169342d
+- **e30**: “[FREE] BMW M3 E30” by Martin Trafas — CC Attribution — https://sketchfab.com/3d-models/free-bmw-m3-e30-ac3c7013434e403e8faff87948caf422
+- **e36m3**: “1993 BMW M3 Coupe (E36)” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/1993-bmw-m3-coupe-e36-76401039fa80419ab036bea09acb898d
+- **e46m3**: “BMW M3 E46” by Lexyc16 — CC Attribution-NonCommercial — https://sketchfab.com/3d-models/bmw-m3-e46-a067132c75f5456daa4f60c4001337d7
+- **e92m3**: “2010 BMW M3 (E92)” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2010-bmw-m3-e92-14f97cec80fe4ecd9bd48f3b47bceaad
+- **eg6**: “1992 Honda Civic SiR II (EG)” by OUTPISTON — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/1992-honda-civic-sir-ii-eg-6da0242475be43649237efa16ea1061f
+- **ek9**: “Honda Civic Type R (EK9)” by Mona x Supercars — CC Attribution — https://sketchfab.com/3d-models/honda-civic-type-r-ek9-4df76c1974cd4173a7a941bfec7714ab
+- **elantra_n**: “2022 Hyundai Elantra N” by tonielpro520 — CC Attribution — https://sketchfab.com/3d-models/2022-hyundai-elantra-n-cd5741852515425aa3c058b7e081dd2c
+- **elise_s2**: “2006 Lotus Elise” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2006-lotus-elise-ea5927b1a3f04c2589ec80cb1113675e
+- **evo6**: “1999 Mitsubishi Lancer Evolution VI GSR T.M.E” by SIU Car Garage — CC Attribution-NonCommercial — https://sketchfab.com/3d-models/1999-mitsubishi-lancer-evolution-vi-gsr-tme-d565cdb23b864308acc9678baa05d5d3
+- **evo9**: “Mitsubishi Lancer Evolution IX MR GSR '06” by Asadawut.Kaewma — CC Attribution — https://sketchfab.com/3d-models/mitsubishi-lancer-evolution-ix-mr-gsr-06-cac5584656b54560bf111d0a792a2458
+- **evox**: “2015 Mitsubishi Lancer Evolution Final Edition” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2015-mitsubishi-lancer-evolution-final-edition-a31a821037c94684bbbd3312cd4d5896
+- **f488**: “2019 Ferrari 488 Pista” by Ddiaz Design — CC Attribution — https://sketchfab.com/3d-models/2019-ferrari-488-pista-1d1344847d8540e9a6a7f21184ab7769
+- **f80m3**: “2015 BMW M3 (F80)” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2015-bmw-m3-f80-547ab5f3b534473fbef71404bae708c5
+- **fc3s**: “Mazda RX-7 FC” by Lexyc16 — CC Attribution — https://sketchfab.com/3d-models/mazda-rx-7-fc-8ac0df459f514950ab83ac37109a06ab
+- **fd3s**: “1999 Mazda RX-7 FD” by OUTPISTON — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/1999-mazda-rx-7-fd-6ea4245c67c1438189fe37ca91516d78
+- **fk8**: “Honda Civic Type R FK8” by Nieve5677 — CC Attribution — https://sketchfab.com/3d-models/honda-civic-type-r-fk8-280996c1edbf4347a7d8b4bb69a0129f
+- **fl5**: “Honda Civic Type R (FL5)” by Mona x Supercars — CC Attribution — https://sketchfab.com/3d-models/honda-civic-type-r-fl5-2f54931a83744e048cacc3886d6cf5da
+- **focusrs**: “2016 Ford Focus RS” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2016-ford-focus-rs-27e25fcead154e62a1dd8e92ccedb691
+- **fox**: “1981 Foxbody Mustang” by David_Holiday — CC Attribution — https://sketchfab.com/3d-models/1981-foxbody-mustang-dcf5aa175d7d4c82b3244b7c0296a81b
+- **g80**: “BMW M3 Competition G80” by Sloftm_Carz — CC Attribution — https://sketchfab.com/3d-models/bmw-m3-competition-g80-0550ac4d2a3846b3bb75370eb8ef84c1
+- **golfr**: “2014 Volkswagen Golf GTI Mk7” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2014-volkswagen-golf-gti-mk7-93f2b79c56c14b269fbe914205c4712e
+- **gr86**: “GR86 2021” by Galaxy Car Showroom — CC Attribution — https://sketchfab.com/3d-models/gr86-2021-0d83090a0d484d98b6749dbbf9b4a111
+- **grcorolla**: “Rhd Gr Corolla skit” by AIRKILL2222000 — CC Attribution — https://sketchfab.com/3d-models/rhd-gr-corolla-skit-da11a36acb3f4900b3655ee5ecbb050b
+- **gt350**: “2016 Ford Mustang Shelby GT350R” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2016-ford-mustang-shelby-gt350r-1d03bb121b6e4371b0978dc584b788d8
+- **gt3_991**: “2017 Porsche 911 (991) GT3 RS” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2017-porsche-911-991-gt3-rs-b45ae79c8ec840a98fae0581af4be396
+- **gt4_718**: “2020 Porsche 718 Cayman GT4” by Outlaw Games™ — CC Attribution-NonCommercial — https://sketchfab.com/3d-models/2020-porsche-718-cayman-gt4-357999b7e87642e38062623127a61bb2
+- **gti_mk2**: “1992-volkswagen-golf-gti-mk2” by 007 — CC Attribution — https://sketchfab.com/3d-models/1992-volkswagen-golf-gti-mk2-12f7f81c533b48d3adb0a7d767b90a56
+- **gti_mk5**: “vw golf 5 gti” by Preview2SEbIT69 — CC Attribution — https://sketchfab.com/3d-models/vw-golf-5-gti-4389c32f54964b5ab01aa8462419b6c1
+- **gti_mk7**: “2014 Volkswagen Golf GTI Mk7” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2014-volkswagen-golf-gti-mk7-93f2b79c56c14b269fbe914205c4712e
+- **hellcat**: “2015 Dodge Challenger SRT Hellcat” by OUTPISTON — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2015-dodge-challenger-srt-hellcat-f988242b4f124037aecdd6df1095365d
+- **huracan_evo**: “2019 Lamborghini Huracan Evo” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2019-lamborghini-huracan-evo-089c0f05bd76412e96f94a121f6dcec7
+- **m3p**: “Tesla Model 3 (Realistic Graphics)” by ChoochooLi Models — CC Attribution — https://sketchfab.com/3d-models/tesla-model-3-realistic-graphics-4cf4fa457fbe4f32808348d7b8a13939
+- **m720s**: “2017 McLaren 720S” by OUTPISTON — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2017-mclaren-720s-56dff31093154a788f103fa39be90dc2
+- **miata_na**: “1990 Mazda Miata NA” by Ricy — CC Attribution — https://sketchfab.com/3d-models/1990-mazda-miata-na-7acee5044310499f85df631b203227b5
+- **miata_nb**: “1998 Mazda MX 5 (Nb)” by Res1n — CC Attribution — https://sketchfab.com/3d-models/1998-mazda-mx-5-nb-25fc4c8bd4494fe0b9e456644b269c6f
+- **miata_nc**: “2009 Mazda MX-5 Miata (NC)” by DisneyCars — CC Attribution — https://sketchfab.com/3d-models/2009-mazda-mx-5-miata-nc-44f83bd458df4025b8daa7f6eeb36b1f
+- **miata_nd**: “2014 Mazda MX-5 (ND)” by Res1n — CC Attribution — https://sketchfab.com/3d-models/2014-mazda-mx-5-nd-35bd007e1bc549d580ccc208a6038ec1
+- **nc1**: “2017 Acura NSX” by Galaxy Car Showroom — CC Attribution — https://sketchfab.com/3d-models/2017-acura-nsx-8b65abfa08a84a88979ee2bfdae9a5c8
+- **nsx_na1**: “1997 Honda NSX Type S Zero (NA1)” by DisneyCars — CC Attribution — https://sketchfab.com/3d-models/1997-honda-nsx-type-s-zero-na1-7901879d9ae94581931886b20fc7f100
+- **r32**: “1989 Nissan Skyline GT-R (R32)” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/1989-nissan-skyline-gt-r-r32-ba48a6529b8e47eeb43a6e19c227abfd
+- **r33**: “Nissan Skyline GTR r33” by Black Snow — CC Attribution — https://sketchfab.com/3d-models/nissan-skyline-gtr-r33-6df98cc48f5a4c3192950e5a91e74b96
+- **r34**: “Nissan Skyline R34 GT-R” by Lexyc16 — CC Attribution — https://sketchfab.com/3d-models/nissan-skyline-r34-gt-r-ff8fb2251dfa4bb9979e7022c5a6666c
+- **r35**: “Nissan_skyline_r35_gtr_nismo._free” by Jean Wally's™ — CC Attribution — https://sketchfab.com/3d-models/nissan-skyline-r35-gtr-nismo-free-b2f9f4aa2c7b4cd9a71471641a2dcace
+- **r8v10**: “2010 Audi R8 V10 5.2 FSI quattro” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2010-audi-r8-v10-52-fsi-quattro-a5bd24c3c1334dda91e570eb4f6c2500
+- **raptor**: “2017 Ford F-150 Raptor” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2017-ford-f-150-raptor-2be278ef4dc94d9fa00fae8b33da8273
+- **rx8**: “2011 Mazda RX-8 Spirit R” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2011-mazda-rx-8-spirit-r-fbf600c22be0419fa4e304675e41ca51
+- **rz34**: “2023 Nissan Z (RZ34)” by DisneyCars — CC Attribution — https://sketchfab.com/3d-models/2023-nissan-z-rz34-17668144004c4e7d96bcee3e418d1b66
+- **s13**: “1992 Nissan Silvia S13” by bagged_ls — CC Attribution — https://sketchfab.com/3d-models/1992-nissan-silvia-s13-6fa8f1948f954e3b980b5e96f203815a
+- **s14**: “1998 Nissan Silvia K’s Aero (S14)” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/1998-nissan-silvia-ks-aero-s14-53710f85571049f8ba4e9f397cf2bb7e
+- **s15**: “2002 Nissan Silvia S15 Spec R Aero” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2002-nissan-silvia-s15-spec-r-aero-8afd07698ca6414dad100af12dfd0d62
+- **s197**: “2013 Ford Mustang GT” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2013-ford-mustang-gt-1368b104aa8148a3be15f4dfc8832045
+- **s2000**: “2001 Honda S2000” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2001-honda-s2000-f4db212b0ee24337bb6f3170fac1efd9
+- **s30**: “Nissan Fairlady Z S30(240Z) 1978” by Lexyc16 — CC Attribution-NonCommercial — https://sketchfab.com/3d-models/nissan-fairlady-z-s30240z-1978-0d9286ebb8cc426e993e1d398b874a34
+- **s550gt**: “2018 Ford Mustang GT” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2018-ford-mustang-gt-75509e00007b462b9b77cb02759c2478
+- **s650**: “2024 Ford Mustang GT” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2024-ford-mustang-gt-16f0753d26a04a089223f2d9107a777f
+- **sti_gd**: “2006 Subaru Impreza WRX STI” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2006-subaru-impreza-wrx-sti-e1486bac59734e188401721aa3efd59f
+- **sti_gr**: “2011 Subaru Impreza WRX STI Hatchback” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2011-subaru-impreza-wrx-sti-hatchback-f7ce18246466400e8a2b99337b183b74
+- **sti_va**: “2018 Subaru WRX STI” by 007 — CC Attribution — https://sketchfab.com/3d-models/2018-subaru-wrx-sti-bca6328e0b584981bb9e0c0036fc1ac0
+- **t996**: “Porsche 911 Turbo (996) 2000 by Alex.Ka.” by ᗩᒪE᙭. Kᗩ.🚗 — CC Attribution-NonCommercial — https://sketchfab.com/3d-models/porsche-911-turbo-996-2000-by-alexka-28dbd43350bf462c806d5ba3d608e1cc
+- **viper_acr**: “2016 Dodge Viper ACR” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2016-dodge-viper-acr-f9849ec2069343f4a7fafbc94f5e80c0
+- **viper_gts**: “1996 Dodge Viper GTS” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/1996-dodge-viper-gts-0ac4113fd996448bbc691343d0e044e0
+- **wrx_vb**: “2022 Subaru Impreza WRX” by tonielpro520 — CC Attribution — https://sketchfab.com/3d-models/2022-subaru-impreza-wrx-065804733fa245c6b1b10ca2de44099d
+- **z32**: “1992 Nissan 300ZX Twin-Turbo (Z32)” by OUTPISTON — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/1992-nissan-300zx-twin-turbo-z32-fb178aedd6784bb3b1ca3da1ef292f3d
+- **z33**: “2006 Nissan 350Z” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2006-nissan-350z-adec36540a4b42faa2a2f8c09ac73652
+- **z34**: “2012 Nissan 370Z (Z34)” by Ddiaz Design — CC Attribution-NonCommercial-ShareAlike — https://sketchfab.com/3d-models/2012-nissan-370z-z34-5de3291217b547cdb29813699eda365b

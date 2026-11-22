@@ -1,0 +1,643 @@
+{
+ "miata_na": {
+  "uid": "7acee5044310499f85df631b203227b5",
+  "name": "1990 Mazda Miata NA",
+  "license": "CC Attribution",
+  "author": "ngon_3d",
+  "url": "https://sketchfab.com/3d-models/none-7acee5044310499f85df631b203227b5",
+  "faces": 115320
+ },
+ "miata_nd": {
+  "uid": "35bd007e1bc549d580ccc208a6038ec1",
+  "name": "2014 Mazda MX-5 (ND)",
+  "license": "CC Attribution",
+  "author": "Res1n",
+  "url": "https://sketchfab.com/3d-models/none-35bd007e1bc549d580ccc208a6038ec1",
+  "faces": 1308665
+ },
+ "fd3s": {
+  "uid": "6ea4245c67c1438189fe37ca91516d78",
+  "name": "1999 Mazda RX-7 FD",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "outpiston",
+  "url": "https://sketchfab.com/3d-models/none-6ea4245c67c1438189fe37ca91516d78",
+  "faces": 650294
+ },
+ "gr86": {
+  "uid": "0d83090a0d484d98b6749dbbf9b4a111",
+  "name": "GR86 2021",
+  "license": "CC Attribution",
+  "author": "adrianaflak09",
+  "url": "https://sketchfab.com/3d-models/none-0d83090a0d484d98b6749dbbf9b4a111",
+  "faces": 318884
+ },
+ "brz_zc6": {
+  "uid": "9619c092b4dd496a978dee79194da288",
+  "name": "2013 Subaru BRZ",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-9619c092b4dd496a978dee79194da288",
+  "faces": 63612
+ },
+ "grcorolla": {
+  "uid": "da11a36acb3f4900b3655ee5ecbb050b",
+  "name": "Rhd Gr Corolla skit",
+  "license": "CC Attribution",
+  "author": "airkillyoume22",
+  "url": "https://sketchfab.com/3d-models/none-da11a36acb3f4900b3655ee5ecbb050b",
+  "faces": 2208536
+ },
+ "z33": {
+  "uid": "adec36540a4b42faa2a2f8c09ac73652",
+  "name": "2006 Nissan 350Z",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-adec36540a4b42faa2a2f8c09ac73652",
+  "faces": 43102
+ },
+ "z34": {
+  "uid": "5de3291217b547cdb29813699eda365b",
+  "name": "2012 Nissan 370Z (Z34)",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-5de3291217b547cdb29813699eda365b",
+  "faces": 35698
+ },
+ "s13": {
+  "uid": "6fa8f1948f954e3b980b5e96f203815a",
+  "name": "1992 Nissan Silvia S13",
+  "license": "CC Attribution",
+  "author": "lstance",
+  "url": "https://sketchfab.com/3d-models/none-6fa8f1948f954e3b980b5e96f203815a",
+  "faces": 54140
+ },
+ "s15": {
+  "uid": "8afd07698ca6414dad100af12dfd0d62",
+  "name": "2002 Nissan Silvia S15 Spec R Aero",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-8afd07698ca6414dad100af12dfd0d62",
+  "faces": 56617
+ },
+ "r34": {
+  "uid": "ff8fb2251dfa4bb9979e7022c5a6666c",
+  "name": "Nissan Skyline R34 GT-R",
+  "license": "CC Attribution",
+  "author": "Lexyc16",
+  "url": "https://sketchfab.com/3d-models/none-ff8fb2251dfa4bb9979e7022c5a6666c",
+  "faces": 62484
+ },
+ "r35": {
+  "uid": "b2f9f4aa2c7b4cd9a71471641a2dcace",
+  "name": "Nissan_skyline_r35_gtr_nismo._free",
+  "license": "CC Attribution",
+  "author": "JeanWallace10",
+  "url": "https://sketchfab.com/3d-models/none-b2f9f4aa2c7b4cd9a71471641a2dcace",
+  "faces": 783988
+ },
+ "fl5": {
+  "uid": "2f54931a83744e048cacc3886d6cf5da",
+  "name": "Honda Civic Type R (FL5)",
+  "license": "CC Attribution",
+  "author": "Car2022",
+  "url": "https://sketchfab.com/3d-models/none-2f54931a83744e048cacc3886d6cf5da",
+  "faces": 141777
+ },
+ "eg6": {
+  "uid": "6da0242475be43649237efa16ea1061f",
+  "name": "1992 Honda Civic SiR II (EG)",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "outpiston",
+  "url": "https://sketchfab.com/3d-models/none-6da0242475be43649237efa16ea1061f",
+  "faces": 95865
+ },
+ "s2000": {
+  "uid": "f4db212b0ee24337bb6f3170fac1efd9",
+  "name": "2001 Honda S2000",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-f4db212b0ee24337bb6f3170fac1efd9",
+  "faces": 217372
+ },
+ "nsx_na1": {
+  "uid": "7901879d9ae94581931886b20fc7f100",
+  "name": "1997 Honda NSX Type S Zero (NA1)",
+  "license": "CC Attribution",
+  "author": "supercarmodels",
+  "url": "https://sketchfab.com/3d-models/none-7901879d9ae94581931886b20fc7f100",
+  "faces": 52174
+ },
+ "dc2": {
+  "uid": "db88d2cc21654a4eb73ec9f0c2a7e113",
+  "name": "1998 Honda Integra Type R DC2",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-db88d2cc21654a4eb73ec9f0c2a7e113",
+  "faces": 144245
+ },
+ "evo9": {
+  "uid": "cac5584656b54560bf111d0a792a2458",
+  "name": "Mitsubishi Lancer Evolution IX MR GSR '06",
+  "license": "CC Attribution",
+  "author": "Asadawut.Kaewma",
+  "url": "https://sketchfab.com/3d-models/none-cac5584656b54560bf111d0a792a2458",
+  "faces": 1328557
+ },
+ "sti_gd": {
+  "uid": "e1486bac59734e188401721aa3efd59f",
+  "name": "2006 Subaru Impreza WRX STI",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-e1486bac59734e188401721aa3efd59f",
+  "faces": 83291
+ },
+ "wrx_vb": {
+  "uid": "065804733fa245c6b1b10ca2de44099d",
+  "name": "2022 Subaru Impreza WRX",
+  "license": "CC Attribution",
+  "author": "tonielpro520",
+  "url": "https://sketchfab.com/3d-models/none-065804733fa245c6b1b10ca2de44099d",
+  "faces": 377976
+ },
+ "s550gt": {
+  "uid": "75509e00007b462b9b77cb02759c2478",
+  "name": "2018 Ford Mustang GT",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-75509e00007b462b9b77cb02759c2478",
+  "faces": 214641
+ },
+ "gt350": {
+  "uid": "1d03bb121b6e4371b0978dc584b788d8",
+  "name": "2016 Ford Mustang Shelby GT350R",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-1d03bb121b6e4371b0978dc584b788d8",
+  "faces": 126252
+ },
+ "focusrs": {
+  "uid": "27e25fcead154e62a1dd8e92ccedb691",
+  "name": "2016 Ford Focus RS",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-27e25fcead154e62a1dd8e92ccedb691",
+  "faces": 85963
+ },
+ "raptor": {
+  "uid": "2be278ef4dc94d9fa00fae8b33da8273",
+  "name": "2017 Ford F-150 Raptor",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-2be278ef4dc94d9fa00fae8b33da8273",
+  "faces": 62499
+ },
+ "c6z06": {
+  "uid": "a0a8832577594c13b8626fa9069885d2",
+  "name": "2013 Chevrolet Corvette Z06",
+  "license": "CC Attribution",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-a0a8832577594c13b8626fa9069885d2",
+  "faces": 71804
+ },
+ "c8": {
+  "uid": "790c40ccff6843eab0b7b4bd18421ff8",
+  "name": "2019 Chevrolet Corvette C8 Stingray",
+  "license": "CC Attribution",
+  "author": "Haris3D",
+  "url": "https://sketchfab.com/3d-models/none-790c40ccff6843eab0b7b4bd18421ff8",
+  "faces": 263691
+ },
+ "camaro_ss": {
+  "uid": "7e7d5537cf3048ae874fc9af23c28c44",
+  "name": "2017 Chevrolet Camaro SS",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "outpiston",
+  "url": "https://sketchfab.com/3d-models/none-7e7d5537cf3048ae874fc9af23c28c44",
+  "faces": 30400
+ },
+ "camaro69": {
+  "uid": "c58b2066d136450e9593eb747a72ac85",
+  "name": "Chevrolet Camaro - SS 1969",
+  "license": "CC Attribution",
+  "author": "GastonDou1",
+  "url": "https://sketchfab.com/3d-models/none-c58b2066d136450e9593eb747a72ac85",
+  "faces": 174221
+ },
+ "hellcat": {
+  "uid": "f988242b4f124037aecdd6df1095365d",
+  "name": "2015 Dodge Challenger SRT Hellcat",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "outpiston",
+  "url": "https://sketchfab.com/3d-models/none-f988242b4f124037aecdd6df1095365d",
+  "faces": 134377
+ },
+ "viper_acr": {
+  "uid": "f9849ec2069343f4a7fafbc94f5e80c0",
+  "name": "2016 Dodge Viper ACR",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-f9849ec2069343f4a7fafbc94f5e80c0",
+  "faces": 80769
+ },
+ "e30": {
+  "uid": "ac3c7013434e403e8faff87948caf422",
+  "name": "[FREE] BMW M3 E30",
+  "license": "CC Attribution",
+  "author": "TinoD2",
+  "url": "https://sketchfab.com/3d-models/none-ac3c7013434e403e8faff87948caf422",
+  "faces": 117261
+ },
+ "e46m3": {
+  "uid": "a067132c75f5456daa4f60c4001337d7",
+  "name": "BMW M3 E46",
+  "license": "CC Attribution-NonCommercial",
+  "author": "Lexyc16",
+  "url": "https://sketchfab.com/3d-models/none-a067132c75f5456daa4f60c4001337d7",
+  "faces": 32822
+ },
+ "g80": {
+  "uid": "0550ac4d2a3846b3bb75370eb8ef84c1",
+  "name": "BMW M3 Competition G80",
+  "license": "CC Attribution",
+  "author": "SLBofficial",
+  "url": "https://sketchfab.com/3d-models/none-0550ac4d2a3846b3bb75370eb8ef84c1",
+  "faces": 1630102
+ },
+ "gt3_991": {
+  "uid": "b45ae79c8ec840a98fae0581af4be396",
+  "name": "2017 Porsche 911 (991) GT3 RS",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-b45ae79c8ec840a98fae0581af4be396",
+  "faces": 138151
+ },
+ "gt4_718": {
+  "uid": "357999b7e87642e38062623127a61bb2",
+  "name": "2020 Porsche 718 Cayman GT4",
+  "license": "CC Attribution-NonCommercial",
+  "author": "Outlaw_Games",
+  "url": "https://sketchfab.com/3d-models/none-357999b7e87642e38062623127a61bb2",
+  "faces": 199186
+ },
+ "944t": {
+  "uid": "570249cd14c342ea947b05fee05245d9",
+  "name": "1991 Porsche 944 Turbo",
+  "license": "CC Attribution",
+  "author": "supercarmodels",
+  "url": "https://sketchfab.com/3d-models/none-570249cd14c342ea947b05fee05245d9",
+  "faces": 91043
+ },
+ "huracan_evo": {
+  "uid": "089c0f05bd76412e96f94a121f6dcec7",
+  "name": "2019 Lamborghini Huracan Evo",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-089c0f05bd76412e96f94a121f6dcec7",
+  "faces": 608350
+ },
+ "r8v10": {
+  "uid": "a5bd24c3c1334dda91e570eb4f6c2500",
+  "name": "2010 Audi R8 V10 5.2 FSI quattro",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-a5bd24c3c1334dda91e570eb4f6c2500",
+  "faces": 204542
+ },
+ "f488": {
+  "uid": "1d1344847d8540e9a6a7f21184ab7769",
+  "name": "2019 Ferrari 488 Pista",
+  "license": "CC Attribution",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-1d1344847d8540e9a6a7f21184ab7769",
+  "faces": 175551
+ },
+ "m720s": {
+  "uid": "56dff31093154a788f103fa39be90dc2",
+  "name": "2017 McLaren 720S",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "outpiston",
+  "url": "https://sketchfab.com/3d-models/none-56dff31093154a788f103fa39be90dc2",
+  "faces": 36023
+ },
+ "m3p": {
+  "uid": "4cf4fa457fbe4f32808348d7b8a13939",
+  "name": "Tesla Model 3 (Realistic Graphics)",
+  "license": "CC Attribution",
+  "author": "ChoochooLi-sketchfab",
+  "url": "https://sketchfab.com/3d-models/none-4cf4fa457fbe4f32808348d7b8a13939",
+  "faces": 684315
+ },
+ "gti_mk7": {
+  "uid": "93f2b79c56c14b269fbe914205c4712e",
+  "name": "2014 Volkswagen Golf GTI Mk7",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-93f2b79c56c14b269fbe914205c4712e",
+  "faces": 98695
+ },
+ "elantra_n": {
+  "uid": "cd5741852515425aa3c058b7e081dd2c",
+  "name": "2022 Hyundai Elantra N",
+  "license": "CC Attribution",
+  "author": "tonielpro520",
+  "url": "https://sketchfab.com/3d-models/none-cd5741852515425aa3c058b7e081dd2c",
+  "faces": 500248
+ },
+ "elise_s2": {
+  "uid": "ea5927b1a3f04c2589ec80cb1113675e",
+  "name": "2006 Lotus Elise",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-ea5927b1a3f04c2589ec80cb1113675e",
+  "faces": 34771
+ },
+ "golfr": {
+  "uid": "93f2b79c56c14b269fbe914205c4712e",
+  "name": "2014 Volkswagen Golf GTI Mk7",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-93f2b79c56c14b269fbe914205c4712e",
+  "faces": 98695,
+  "shared": true
+ },
+ "a80": {
+  "uid": "61d402d6de904374bfe5a98907c85b1d",
+  "name": "TOYOTA SUPRA MK4 (A80)",
+  "license": "CC Attribution-NonCommercial",
+  "author": "?",
+  "url": "https://sketchfab.com/3d-models/61d402d6de904374bfe5a98907c85b1d",
+  "faces": 213493
+ },
+ "a90": {
+  "uid": "4b829105275f4e06a824fad6d1eaf259",
+  "name": "2020 Toyota GR Supra",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "?",
+  "url": "https://sketchfab.com/3d-models/4b829105275f4e06a824fad6d1eaf259",
+  "faces": 225137
+ },
+ "ae86": {
+  "uid": "a5737bf3cc9b4179a6e5ebe173ff70d9",
+  "name": "Toyota AE86 Sprinter Trueno Zenki",
+  "license": "CC Attribution",
+  "author": "?",
+  "url": "https://sketchfab.com/3d-models/a5737bf3cc9b4179a6e5ebe173ff70d9",
+  "faces": 706225
+ },
+ "miata_nb": {
+  "uid": "25fc4c8bd4494fe0b9e456644b269c6f",
+  "name": "1998 Mazda MX 5 (Nb)",
+  "license": "CC Attribution",
+  "author": "Res1n",
+  "url": "https://sketchfab.com/3d-models/none-25fc4c8bd4494fe0b9e456644b269c6f",
+  "faces": 764947
+ },
+ "miata_nc": {
+  "uid": "44f83bd458df4025b8daa7f6eeb36b1f",
+  "name": "2009 Mazda MX-5 Miata (NC)",
+  "license": "CC Attribution",
+  "author": "supercarmodels",
+  "url": "https://sketchfab.com/3d-models/none-44f83bd458df4025b8daa7f6eeb36b1f",
+  "faces": 1089965
+ },
+ "fc3s": {
+  "uid": "8ac0df459f514950ab83ac37109a06ab",
+  "name": "Mazda RX-7 FC",
+  "license": "CC Attribution",
+  "author": "Lexyc16",
+  "url": "https://sketchfab.com/3d-models/none-8ac0df459f514950ab83ac37109a06ab",
+  "faces": 40928
+ },
+ "rx8": {
+  "uid": "fbf600c22be0419fa4e304675e41ca51",
+  "name": "2011 Mazda RX-8 Spirit R",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-fbf600c22be0419fa4e304675e41ca51",
+  "faces": 117592
+ },
+ "s30": {
+  "uid": "0d9286ebb8cc426e993e1d398b874a34",
+  "name": "Nissan Fairlady Z S30(240Z) 1978",
+  "license": "CC Attribution-NonCommercial",
+  "author": "Lexyc16",
+  "url": "https://sketchfab.com/3d-models/none-0d9286ebb8cc426e993e1d398b874a34",
+  "faces": 197310
+ },
+ "s14": {
+  "uid": "53710f85571049f8ba4e9f397cf2bb7e",
+  "name": "1998 Nissan Silvia K\u2019s Aero (S14)",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-53710f85571049f8ba4e9f397cf2bb7e",
+  "faces": 99834
+ },
+ "z32": {
+  "uid": "fb178aedd6784bb3b1ca3da1ef292f3d",
+  "name": "1992 Nissan 300ZX Twin-Turbo (Z32)",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "outpiston",
+  "url": "https://sketchfab.com/3d-models/none-fb178aedd6784bb3b1ca3da1ef292f3d",
+  "faces": 43305
+ },
+ "rz34": {
+  "uid": "17668144004c4e7d96bcee3e418d1b66",
+  "name": "2023 Nissan Z (RZ34)",
+  "license": "CC Attribution",
+  "author": "supercarmodels",
+  "url": "https://sketchfab.com/3d-models/none-17668144004c4e7d96bcee3e418d1b66",
+  "faces": 66898
+ },
+ "r32": {
+  "uid": "ba48a6529b8e47eeb43a6e19c227abfd",
+  "name": "1989 Nissan Skyline GT-R (R32)",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-ba48a6529b8e47eeb43a6e19c227abfd",
+  "faces": 345058
+ },
+ "r33": {
+  "uid": "6df98cc48f5a4c3192950e5a91e74b96",
+  "name": "Nissan Skyline GTR r33",
+  "license": "CC Attribution",
+  "author": "BlackSnow02",
+  "url": "https://sketchfab.com/3d-models/none-6df98cc48f5a4c3192950e5a91e74b96",
+  "faces": 286336
+ },
+ "ek9": {
+  "uid": "4df76c1974cd4173a7a941bfec7714ab",
+  "name": "Honda Civic Type R (EK9)",
+  "license": "CC Attribution",
+  "author": "Car2022",
+  "url": "https://sketchfab.com/3d-models/none-4df76c1974cd4173a7a941bfec7714ab",
+  "faces": 238188
+ },
+ "fk8": {
+  "uid": "280996c1edbf4347a7d8b4bb69a0129f",
+  "name": "Honda Civic Type R FK8",
+  "license": "CC Attribution",
+  "author": "niev",
+  "url": "https://sketchfab.com/3d-models/none-280996c1edbf4347a7d8b4bb69a0129f",
+  "faces": 354366
+ },
+ "dc5": {
+  "uid": "5ea7a900615c4e38998b73e05169342d",
+  "name": "2001 Honda Integra Type-R (DC5)",
+  "license": "CC Attribution",
+  "author": "tangwang920",
+  "url": "https://sketchfab.com/3d-models/none-5ea7a900615c4e38998b73e05169342d",
+  "faces": 30165
+ },
+ "nc1": {
+  "uid": "8b65abfa08a84a88979ee2bfdae9a5c8",
+  "name": "2017 Acura NSX",
+  "license": "CC Attribution",
+  "author": "adrianaflak09",
+  "url": "https://sketchfab.com/3d-models/none-8b65abfa08a84a88979ee2bfdae9a5c8",
+  "faces": 54308
+ },
+ "evo6": {
+  "uid": "d565cdb23b864308acc9678baa05d5d3",
+  "name": "1999 Mitsubishi Lancer Evolution VI GSR T.M.E",
+  "license": "CC Attribution-NonCommercial",
+  "author": "Game_mode",
+  "url": "https://sketchfab.com/3d-models/none-d565cdb23b864308acc9678baa05d5d3",
+  "faces": 43747
+ },
+ "evox": {
+  "uid": "a31a821037c94684bbbd3312cd4d5896",
+  "name": "2015 Mitsubishi Lancer Evolution Final Edition",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-a31a821037c94684bbbd3312cd4d5896",
+  "faces": 225047
+ },
+ "sti_gr": {
+  "uid": "f7ce18246466400e8a2b99337b183b74",
+  "name": "2011 Subaru Impreza WRX STI Hatchback",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-f7ce18246466400e8a2b99337b183b74",
+  "faces": 51838
+ },
+ "sti_va": {
+  "uid": "bca6328e0b584981bb9e0c0036fc1ac0",
+  "name": "2018 Subaru WRX STI",
+  "license": "CC Attribution",
+  "author": "tangwang920",
+  "url": "https://sketchfab.com/3d-models/none-bca6328e0b584981bb9e0c0036fc1ac0",
+  "faces": 226379
+ },
+ "s197": {
+  "uid": "1368b104aa8148a3be15f4dfc8832045",
+  "name": "2013 Ford Mustang GT",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-1368b104aa8148a3be15f4dfc8832045",
+  "faces": 86094
+ },
+ "s650": {
+  "uid": "16f0753d26a04a089223f2d9107a777f",
+  "name": "2024 Ford Mustang GT",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-16f0753d26a04a089223f2d9107a777f",
+  "faces": 295476
+ },
+ "c5z06": {
+  "uid": "283f9ddde44f4caeacb544d4057dcd3d",
+  "name": "Chevrolet Corvette C5 (Blue)",
+  "license": "CC Attribution",
+  "author": "throwbackthursdaymodels",
+  "url": "https://sketchfab.com/3d-models/none-283f9ddde44f4caeacb544d4057dcd3d",
+  "faces": 44694
+ },
+ "c7z06": {
+  "uid": "729fc2a2dccd4ea1b098da30536880f9",
+  "name": "2015 Chevrolet Corvette C7 Z06",
+  "license": "CC Attribution",
+  "author": "srineshchethiya",
+  "url": "https://sketchfab.com/3d-models/none-729fc2a2dccd4ea1b098da30536880f9",
+  "faces": 170912
+ },
+ "camaro5": {
+  "uid": "b2845536739542e1a4493a192990f91b",
+  "name": "2010 Chevrolet Camaro SS",
+  "license": "CC Attribution",
+  "author": "adrianaflak09",
+  "url": "https://sketchfab.com/3d-models/none-b2845536739542e1a4493a192990f91b",
+  "faces": 175541
+ },
+ "e36m3": {
+  "uid": "76401039fa80419ab036bea09acb898d",
+  "name": "1993 BMW M3 Coupe (E36)",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-76401039fa80419ab036bea09acb898d",
+  "faces": 30266
+ },
+ "e92m3": {
+  "uid": "14f97cec80fe4ecd9bd48f3b47bceaad",
+  "name": "2010 BMW M3 (E92)",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-14f97cec80fe4ecd9bd48f3b47bceaad",
+  "faces": 49969
+ },
+ "f80m3": {
+  "uid": "547ab5f3b534473fbef71404bae708c5",
+  "name": "2015 BMW M3 (F80)",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-547ab5f3b534473fbef71404bae708c5",
+  "faces": 32964
+ },
+ "gti_mk2": {
+  "uid": "12f7f81c533b48d3adb0a7d767b90a56",
+  "name": "1992-volkswagen-golf-gti-mk2",
+  "license": "CC Attribution",
+  "author": "tangwang920",
+  "url": "https://sketchfab.com/3d-models/none-12f7f81c533b48d3adb0a7d767b90a56",
+  "faces": 33821
+ },
+ "gti_mk5": {
+  "uid": "4389c32f54964b5ab01aa8462419b6c1",
+  "name": "vw golf 5 gti",
+  "license": "CC Attribution",
+  "author": "Preview2SEBIT69",
+  "url": "https://sketchfab.com/3d-models/none-4389c32f54964b5ab01aa8462419b6c1",
+  "faces": 82390
+ },
+ "viper_gts": {
+  "uid": "0ac4113fd996448bbc691343d0e044e0",
+  "name": "1996 Dodge Viper GTS",
+  "license": "CC Attribution-NonCommercial-ShareAlike",
+  "author": "ddiaz-design",
+  "url": "https://sketchfab.com/3d-models/none-0ac4113fd996448bbc691343d0e044e0",
+  "faces": 246614
+ },
+ "a70": {
+  "uid": "f3cb2d62134144c6b8bec82514f97d08",
+  "name": "1987 Toyota Supra Turbo",
+  "license": "CC Attribution",
+  "author": "tonielpro520",
+  "url": "https://sketchfab.com/3d-models/none-f3cb2d62134144c6b8bec82514f97d08",
+  "faces": 78879
+ },
+ "fox": {
+  "uid": "dcf5aa175d7d4c82b3244b7c0296a81b",
+  "name": "1981 Foxbody Mustang",
+  "license": "CC Attribution",
+  "author": "David_Holiday",
+  "url": "https://sketchfab.com/3d-models/none-dcf5aa175d7d4c82b3244b7c0296a81b",
+  "faces": 27037
+ },
+ "t996": {
+  "uid": "28dbd43350bf462c806d5ba3d608e1cc",
+  "name": "Porsche 911 Turbo (996) 2000 by Alex.Ka.",
+  "license": "CC Attribution-NonCommercial",
+  "author": "Alex.Ka.",
+  "url": "https://sketchfab.com/3d-models/none-28dbd43350bf462c806d5ba3d608e1cc",
+  "faces": 84330
+ }
+}
