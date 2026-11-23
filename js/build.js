@@ -75,6 +75,12 @@ export function migrateSel(sel) {
     if (!n.blocked) for (const id of n.needs) { if (id.startsWith('dt_')) { if (!sel.drivetrain) sel.drivetrain = id; } else if (!sel.fab.includes(id)) sel.fab.push(id); }
   }
   sel.fitV = 2;
+  // valve springs used to share the id 'springs' with the Eibach lowering springs (the suspension part won the lookup)
+  if (Array.isArray(sel.internals) && sel.internals.includes('springs')) {
+    const cfg = (SWAPS[sel.engine] || CAR_BY_ID[sel.car]?.engine)?.cfg || '';
+    sel.internals = sel.internals.filter(id => id !== 'springs');
+    if (!/^R\d$/.test(cfg)) sel.internals.push('valvesprings');   // rotaries have no valves
+  }
   return sel;
 }
 
@@ -137,8 +143,11 @@ export function evaluate(sel) {
     if (r) add(r[0], 'gearbox', `${p.name}: ${r[1]}`);
     if (p && (!r || r[0] !== 'error')) {
       // keep first-gear overall ratio close to what the car had, so launch gearing suits its tires
-      const firstOverall = trans.gears[0] * trans.final;
-      Object.assign(trans, { type: p.tx.type, gears: p.tx.gears, final: +(firstOverall / p.tx.gears[0]).toFixed(2), maxTq: p.tx.rating });
+      // ...but a box with few, widely spaced gears (2-speed Powerglide, 3-speed TH400, 5-speed drag box) keeps the
+      // car's top-gear ratio instead, or it would run out of gears at 150 km/h
+      const firstOverall = trans.gears[0] * trans.final, topOverall = trans.gears[trans.gears.length - 1] * trans.final;
+      const fd = Math.min(firstOverall / p.tx.gears[0], topOverall / p.tx.gears[p.tx.gears.length - 1]);
+      Object.assign(trans, { type: p.tx.type, gears: p.tx.gears, final: +fd.toFixed(2), maxTq: p.tx.rating });
       if (p.tx.shiftTime) trans.swapShift = p.tx.shiftTime;
     }
   }
@@ -397,8 +406,29 @@ const TIRE_LIST = () => Object.values(TIRE_BY_ID);
 // build that currently works (e.g. wheels no tire size fits, a turbo the fuel system can't feed).
 const baseCache = { key: null, errs: null };
 const errKey = i => i.cat + '|' + i.msg.replace(/[\d.,]+/g, '#');   // same problem, different numbers = not new
+// Swapping to a different kind of gearbox (manual / sequential <-> DCT / automatic) brings the matching clutch
+// upgrade: the clutch packs of an auto are a different part from a manual's clutch. Picks the cheapest part of the
+// new kind rated at least as high as the old one (or the strongest there is).
+function transKinds(p) { return p.transTypes || []; }
+export function adaptTrans(sel, gearboxId) {
+  const car = CAR_BY_ID[sel.car], sw = SWAPS[sel.engine];
+  const tx = gearboxId && PART_BY_ID[gearboxId]?.tx;
+  const type = tx ? tx.type : (sw ? sw.trans?.type : car?.trans?.type) || car?.trans?.type;
+  if (!type) return sel;
+  // manual-only driveline bits (short shifter, light flywheel) come off with a non-manual box
+  if (type !== 'MT' && Array.isArray(sel.driveline)) {
+    const dl = sel.driveline.filter(id => !['shortshift', 'flywheel'].includes(id));
+    if (dl.length !== sel.driveline.length) sel = { ...sel, driveline: dl };
+  }
+  const cur = sel.trans && PART_BY_ID[sel.trans];
+  if (!cur || !cur.rating || transKinds(cur).includes(type)) return sel;
+  const opts = Object.values(PART_BY_ID).filter(p => p.cat === 'trans' && transKinds(p).includes(type)).sort((a, b) => a.price - b.price);
+  const pick = opts.find(p => p.rating >= cur.rating) || opts.sort((a, b) => b.rating - a.rating)[0] || null;
+  return { ...sel, trans: pick ? pick.id : null };
+}
 export function candidateCheck(sel, cat, id, baseSel = sel) {
-  const s2 = { ...sel };
+  let s2 = { ...sel };
+  if (cat === 'gearbox') s2 = adaptTrans(s2, id);
   const c = CAT_BY_ID[cat];
   if (c.multi) s2[cat] = [...(sel[cat] || []), id];
   else s2[cat] = id;

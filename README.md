@@ -15,11 +15,14 @@ Get the latest version from **[Releases](https://github.com/croatianshrimp/torqu
 | **Mac (Apple Silicon M1–M4)** | `TorqueForge-…-mac-arm64.zip` |
 | **Mac (Intel)** | `TorqueForge-…-mac-x64.zip` |
 
+**Auto-updates:** from 1.1.0 on, the app checks for a new version every time you open it. It downloads only the files that changed and asks to restart. Nothing to reinstall. (If you have 1.0.0, download 1.1.0 once.)
+
 - **Windows:** SmartScreen may say "Windows protected your PC" because the app isn't code-signed. Click **More info → Run anyway**.
 - **Mac:** the app isn't signed either. Unzip it, move it to Applications, then **right-click → Open** the first time. If macOS says it's damaged, run `xattr -cr /Applications/TorqueForge.app` in Terminal.
 
 **From source:** `npm install` once, then `npm start` (desktop) or `./run.sh` (browser at http://127.0.0.1:8765).
 Build the downloads with `npm run dist:linux`, `npm run dist:win`, `npm run dist:mac`.
+**Publish an update** (reaches every installed app on its next launch): `node tools/release.mjs 1.2.0 "What's new"`. It builds everything, commits, tags, pushes and creates the GitHub release. Changes to `desktop/` can't update in place: bump `SHELL` in `desktop/content.js` and players get sent to the download page.
 
 ## What's in it
 - **80 cars**, with several generations of the same model lines (Miata NA→ND, Supra A70→A90, Skyline R32→R35, Civic EG→FL5, Mustang Fox→S650, Corvette C5→C8, M3 E30→G80 …). The garage shows a generation switcher under the car name; the car picker can sort by model line. JDM, Euro, US muscle, supercars, a truck and an EV. Each has real-world specs (mass, wheelbase, weight distribution, engine, gear ratios, Cd/frontal area, bolt pattern, wheel and tire fitment).
@@ -45,7 +48,7 @@ Build the downloads with `npm run dist:linux`, `npm run dist:win`, `npm run dist
 Tests: 0–60 (1-ft rollout), 0–100 km/h, ¼ mile + trap, top speed, 100–0 braking, 61 m skidpad, and a quasi-steady-state lap sim of the 2.48 km test circuit.
 
 ## Test track controls
-Automatic: W/↑ throttle · S/↓ brake/reverse. **Manual** (default for manual-gearbox cars): ↑ throttle · ↓ brake · **W shift up · S shift down**.
+Automatic: W/↑ throttle · S/↓ brake/reverse. **Manual** (default for manual-gearbox cars): same, plus **E shift up · Q shift down**.
 A D/← → steer · Space handbrake · C camera · R restart (respawn in online races). A gamepad works too.
 Cameras: chase, chase far, cockpit (shows the build's interior), hood, bumper, TV trackside, helicopter.
 

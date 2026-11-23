@@ -223,6 +223,16 @@ function rimFaceGeometry(wheelR, style, spokes, seg) {
     } else if (style === 'disc') {         // aero cover: nearly solid, a ring of short cooling slots
       const span = Math.PI * 2 / n;
       for (let k = 0; k < n; k++) holes.push(windowShape(rFace * 0.7, rFace * 0.86, k * span + span * 0.22, (k + 1) * span - span * 0.22, rFace * 0.02));
+    } else if (style === 'slot') {         // solid face with long narrow radial slots (Cragar S/S, skinny drag fronts)
+      const span = Math.PI * 2 / n, sw = Math.min(span * 0.28, 0.16);
+      for (let k = 0; k < n; k++) holes.push(windowShape(rFace * 0.34, rFace * 0.86, (k + 0.5) * span - sw / 2, (k + 0.5) * span + sw / 2, rFace * 0.03));
+    } else if (style === 'tri') {          // spokes in groups of three: one wide window between groups, two thin slots inside
+      const span = Math.PI * 2 / n, sw = span * 0.1;
+      for (let k = 0; k < n; k++) {
+        const a = k * span;
+        holes.push(windowShape(rFace * 0.3, rFace * 0.9, a + sw * 2.6, a + span - sw * 2.6, rFace * 0.07));
+        for (const o of [-1, 1]) holes.push(windowShape(rFace * 0.4, rFace * 0.86, a + o * sw * 1.05 - sw * 0.35, a + o * sw * 1.05 + sw * 0.35, rFace * 0.015));
+      }
     } else if (style === 'beadlock') {     // off-road: chunky spokes + bolted ring
       const span = Math.PI * 2 / n, sw = span * 0.42;
       for (let k = 0; k < n; k++) holes.push(windowShape(rFace * 0.32, rFace * 0.78, k * span + sw / 2, (k + 1) * span - sw / 2, rFace * 0.1));
@@ -239,7 +249,7 @@ function rimFaceGeometry(wheelR, style, spokes, seg) {
     g.deleteAttribute('uv');
     // dish: pull the face back towards the hub as radius shrinks (concave wheel), spokes taper thinner outward
     const pos = g.attributes.position;
-    const dish = { dish: 0.09, steel: 0.035, concave: 0.11, dishspoke: 0.12, turbofan: 0.02, rally: 0.03, directional: 0.08, phonedial: 0, disc: 0, fuchs: 0.04, cross: 0.06, star: 0.07 }[style] ?? 0.055;
+    const dish = { dish: 0.09, steel: 0.035, concave: 0.11, dishspoke: 0.12, turbofan: 0.02, rally: 0.03, directional: 0.08, phonedial: 0, disc: 0, fuchs: 0.04, cross: 0.06, star: 0.07, slot: 0.03, tri: 0.08 }[style] ?? 0.055;
     const flatFace = style === 'phonedial' || style === 'disc';   // big solid faces: a curved dish shows as creases across long triangles
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);

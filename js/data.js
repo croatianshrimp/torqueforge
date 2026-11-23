@@ -568,7 +568,7 @@ IN({ check: pistonOnly, id: 'stroker', brand: 'Eagle / K1', name: 'Stroker kit (
 IN({ check: pistonOnly, id: 'heads', brand: 'Edelbrock / Brodix', name: 'CNC-ported cylinder heads', price: 3900, mass: -3, hpNA: 0.09, tqNA: 0.05, hpBoost: 0.07, tqBoost: 0.05, rev: 150, desc: 'Better airflow: power everywhere, mostly up top.' });
 IN({ check: pistonOnly, id: 'cams', brand: 'Brian Crower / Comp', name: 'Performance camshafts (stage 2)', price: 1600, mass: 0, hpNA: 0.08, tqNA: 0.02, hpBoost: 0.05, tqBoost: 0.02, rev: 500, req: ['springs'], desc: 'More lift and duration: +8% top end, lumpy idle. Needs valve springs to rev.' });
 IN({ check: pistonOnly, id: 'racecams', brand: 'Brian Crower / Comp', name: 'Race camshafts (stage 3)', price: 2200, mass: 0, hpNA: 0.13, tqNA: -0.03, hpBoost: 0.07, tqBoost: -0.02, rev: 800, req: ['springs'], desc: 'Big top end, loses bottom-end torque. Needs valve springs.' });
-IN({ check: pistonOnly, id: 'springs', brand: 'Supertech / Ferrea', name: 'Valve springs + titanium retainers', price: 950, mass: 0, rev: 300, desc: 'Stops valve float: lets the engine rev higher safely.', valveSprings: true });
+IN({ check: pistonOnly, id: 'valvesprings', brand: 'Supertech / Ferrea', name: 'Valve springs + titanium retainers', price: 950, mass: 0, rev: 300, desc: 'Stops valve float: lets the engine rev higher safely.', valveSprings: true });
 IN({ check: pistonOnly, id: 'valves', brand: 'Ferrea / Supertech', name: 'Oversized stainless valves + guides', price: 1300, mass: 0, hpNA: 0.03, hpBoost: 0.03, rev: 100, desc: '+1 mm valves: more flow with ported heads.' });
 IN({ check: pistonOnly, id: 'studs', brand: 'ARP', name: 'Head studs + MLS head gasket', price: 650, mass: 0, boostTol: 0.25, desc: 'Keeps the head on under high boost.' });
 IN({ check: rotaryOnly, id: 'apexseals', brand: 'Goopy / Ceramic', name: '3 mm apex seals + upgraded seal springs', price: 2600, mass: 0, hpBoost: 0.02, boostTol: 1.0, rev: 300, desc: 'Rotary rebuild with stronger apex seals: survives about 2.75× stock power under boost.' });
@@ -607,7 +607,7 @@ P({ id: 'radiator', cat: 'cooling', brand: 'CSF', name: 'Aluminum radiator + oil
 P({ id: 'evcool', cat: 'cooling', brand: 'Generic', name: 'Battery/inverter chiller upgrade', price: 1600, mass: 4, cooling: true, check: (c, x) => isEV(x) ? null : ['error', 'EV only'] });
 
 // Clutch / gearbox
-const TR = (id, brand, name, price, mass, rating, types, extra = {}) => P({ id, cat: 'trans', brand, name, price, mass, rating, ...extra,
+const TR = (id, brand, name, price, mass, rating, types, extra = {}) => P({ id, cat: 'trans', brand, name, price, mass, rating, transTypes: types, ...extra,
   check: (c, x) => types.includes(x.trans.type) ? null : ['error', `For ${types.join('/')} transmissions (yours: ${x.trans.type})`] });
 TR('clutch2', 'ACT', 'Stage 2 clutch (550 Nm)', 650, 0, 550, ['MT', 'SEQ']);
 TR('clutch3', 'Competition', 'Stage 3 sprung puck clutch (750 Nm)', 900, 0, 750, ['MT', 'SEQ']);
@@ -630,9 +630,21 @@ TX('tx_zf8', 'ZF', '8HP 8-speed automatic + standalone TCU', 4800, 12, 'AT', [4.
 TX('tx_10r', 'Ford', '10R80 10-speed automatic', 5600, 15, 'AT', [4.70, 2.99, 2.15, 1.80, 1.52, 1.28, 1.00, 0.85, 0.69, 0.64], 1100, 'long', { shiftTime: 0.11 });
 TX('tx_dct7', 'Getrag', '7-speed dual-clutch (DCT) swap', 9800, 4, 'DCT', [3.91, 2.17, 1.48, 1.12, 0.89, 0.75, 0.63], 800, 'long', { shiftTime: 0.06 });
 TX('tx_seq6', 'Quaife', '6-speed sequential dog box', 17500, -8, 'SEQ', [2.86, 2.06, 1.62, 1.33, 1.14, 0.98], 1200, 'long', { shiftTime: 0.05 });
+TX('tx_dct8', 'Tremec', 'TR-9080 8-speed dual-clutch (DCT)', 11800, 6, 'DCT', [2.91, 1.76, 1.22, 0.97, 0.81, 0.67, 0.56, 0.45], 900, 'long', { shiftTime: 0.05 });
+TX('tx_dct8built', 'Tremec / Dodson', 'TR-9080 8-speed DCT, drag-built (billet shafts)', 19500, 9, 'DCT', [2.91, 1.76, 1.22, 0.97, 0.81, 0.67, 0.56, 0.45], 1900, 'long', { shiftTime: 0.05 });
+TX('tx_zf8built', 'ZF / Level 10', '8HP 8-speed automatic, built (extra clutch packs, billet input)', 9400, 14, 'AT', [4.71, 3.14, 2.11, 1.67, 1.29, 1.00, 0.84, 0.67], 1700, 'long', { shiftTime: 0.1 });
+TX('tx_9g', 'Mercedes-AMG', '9G-Tronic MCT 9-speed automatic + TCU', 6900, 14, 'AT', [5.35, 3.24, 2.25, 1.64, 1.21, 1.00, 0.86, 0.72, 0.60], 1000, 'long', { shiftTime: 0.09 });
+TX('tx_10rbuilt', 'Ford / Circle D', '10R80 10-speed automatic, drag-built', 11500, 17, 'AT', [4.70, 2.99, 2.15, 1.80, 1.52, 1.28, 1.00, 0.85, 0.69, 0.64], 2400, 'long', { shiftTime: 0.08 });
+TX('tx_seq8', 'Quaife', '8-speed sequential, time-attack spec', 24500, -6, 'SEQ', [3.10, 2.30, 1.82, 1.50, 1.27, 1.10, 0.97, 0.86], 1800, 'long', { shiftTime: 0.04 });
+TX('tx_xtrac7', 'Xtrac', 'P1529 7-speed sequential (GT racing)', 32000, -10, 'SEQ', [3.00, 2.18, 1.72, 1.42, 1.21, 1.06, 0.94], 1000, 'long', { shiftTime: 0.035 });
+TX('tx_gf5r', 'G-Force', 'GF5R 5-speed drag sequential (clutchless upshifts)', 15800, -4, 'SEQ', [2.60, 1.85, 1.40, 1.15, 1.00], 2800, 'long', { shiftTime: 0.03 });
+TX('tx_th400', 'TCI / ATI', 'TH400 3-speed drag automatic + converter', 4200, 10, 'AT', [2.48, 1.48, 1.00], 2600, 'long', { shiftTime: 0.06 });
+TX('tx_glide', 'ATI', 'Powerglide 2-speed drag automatic', 3800, -2, 'AT', [1.80, 1.00], 2800, 'long', { shiftTime: 0.05 });
 TX('tx_k6', 'Honda', 'K-series 6-speed manual (transverse)', 2400, 0, 'MT', [3.27, 2.13, 1.52, 1.15, 0.92, 0.75], 520, 'trans');
 TX('tx_dq', 'VW', 'DQ381 7-speed DSG (transverse)', 5200, 6, 'DCT', [3.40, 2.75, 1.65, 1.05, 0.83, 0.86, 0.70], 600, 'trans', { shiftTime: 0.06 });
 TX('tx_seqfwd', 'Sadev', 'SL75 6-speed sequential (transverse)', 16500, -6, 'SEQ', [2.92, 2.12, 1.67, 1.37, 1.15, 0.99], 750, 'trans', { shiftTime: 0.05 });
+TX('tx_dq500', 'VW / HPA', 'DQ500 7-speed DSG, built clutch packs (transverse)', 7600, 8, 'DCT', [3.56, 2.53, 1.68, 1.02, 0.79, 0.84, 0.69], 950, 'trans', { shiftTime: 0.06 });
+TX('tx_8dctt', 'Hyundai N', '8-speed wet dual-clutch (transverse)', 5400, 5, 'DCT', [3.66, 2.43, 1.68, 1.13, 0.83, 0.65, 0.57, 0.50], 650, 'trans', { shiftTime: 0.05 });
 
 // Drivetrain conversions: change which wheels are driven
 const DT = (id, brand, name, price, mass, drive, split, from, desc, extra = {}) => P({ id, cat: 'drivetrain', brand, name, price, mass, pos: 'c', dt: { drive, split, ...extra }, desc,
@@ -674,13 +686,34 @@ SU('springs', 'Eibach', 'Pro-Kit lowering springs', 350, 0, 30, 0.01);
 SU('sportline', 'Eibach', 'Sportline lowering springs', 420, 0, 45, 0.015);
 SU('raisesprings', 'Eibach', 'Pro-Lift raised springs (+25 mm)', 380, 0, -25, -0.01, { truckOk: true });
 SU('bcbr', 'BC Racing', 'BR series coilovers', 1150, -2, 40, 0.03, { adjustable: true, rideRange: [-45, 55] });
-SU('teinflex', 'Tein', 'Flex Z coilovers', 1050, -2, 35, 0.025, { adjustable: true, rideRange: [-35, 40] });
+SU('teinflex', 'Tein', 'Flex Z coilovers', 1050, -2, 35, 0.025, { adjustable: true, rideRange: [-40, 50] });
 SU('fortune', 'Fortune Auto', '500 Series coilovers (stance spec)', 1700, -2, 55, 0.03, { adjustable: true, rideRange: [-40, 65] });
-SU('kwv3', 'KW', 'Variant 3 coilovers', 2900, -3, 35, 0.05, { adjustable: true, rideRange: [-25, 35] });
-SU('ohlins', 'Öhlins', 'Road & Track DFV coilovers', 3300, -4, 35, 0.06, { adjustable: true, rideRange: [-30, 30] });
-SU('mcs', 'MCS', '2-Way Remote coilovers', 6800, -4, 45, 0.08, { adjustable: true, rideRange: [-40, 35] });
+SU('kwv3', 'KW', 'Variant 3 coilovers', 2900, -3, 35, 0.05, { adjustable: true, rideRange: [-35, 45] });
+SU('ohlins', 'Öhlins', 'Road & Track DFV coilovers', 3300, -4, 35, 0.06, { adjustable: true, rideRange: [-35, 45] });
+SU('mcs', 'MCS', '2-Way Remote coilovers', 6800, -4, 45, 0.08, { adjustable: true, rideRange: [-50, 50] });
 SU('rallycoil', 'Reiger', 'Gravel rally coilovers (long travel)', 4200, 2, -40, 0.0, { adjustable: true, rideRange: [-30, 50], truckOk: true, desc: 'Long-travel rally dampers: sits higher, soaks up bumps and kerbs.' });
 SU('airride', 'Air Lift', 'Performance 3P air suspension', 3800, 18, 50, -0.01, { adjustable: true, rideRange: [-110, 50], desc: 'Air up to +60 mm for driveways and speed bumps, or air out to lay frame.' });
+SU('tsprings', 'Tein', 'S.Tech lowering springs (-25 mm)', 330, 0, 25, 0.008);
+SU('hrsport', 'H&R', 'Sport springs (-35 mm)', 380, 0, 35, 0.012);
+SU('hrsuper', 'H&R', 'Super Sport springs (-50 mm)', 410, 0, 50, 0.012);
+SU('rsrdown', 'RS-R', 'Ti2000 Super Down springs (-60 mm)', 460, 0, 60, 0.01);
+SU('vogtland', 'Vogtland', 'Slammed springs (-75 mm)', 440, 0, 75, -0.01, { desc: 'Very low on a fixed spring: looks the part, scrapes on kerbs and bumps.' });
+SU('raise40', 'Ironman', 'Raised rally springs (+40 mm)', 420, 1, -40, -0.015, { truckOk: true });
+SU('bilb16', 'Bilstein', 'B16 PSS10 coilovers', 2300, -2, 30, 0.045, { adjustable: true, rideRange: [-25, 45] });
+SU('hksmax', 'HKS', 'Hipermax S coilovers', 1900, -2, 35, 0.035, { adjustable: true, rideRange: [-40, 55] });
+SU('ksport', 'KSport', 'Kontrol Pro coilovers', 1250, -2, 45, 0.028, { adjustable: true, rideRange: [-55, 65] });
+SU('stancexr', 'Stance', 'XR1 coilovers (extreme low)', 1350, -2, 70, 0.02, { adjustable: true, rideRange: [-50, 80], desc: 'Short-body dampers and helper springs: goes from mild drop all the way to tucking wheel.' });
+SU('iscn1', 'ISC Suspension', 'N1 Street Sport coilovers', 1100, -2, 40, 0.028, { adjustable: true, rideRange: [-50, 60] });
+SU('moton', 'Moton', 'Club Sport 2-way coilovers', 5400, -3, 35, 0.07, { adjustable: true, rideRange: [-40, 45] });
+SU('penske', 'Penske', '8300 triple-adjustable race dampers', 8200, -5, 50, 0.09, { adjustable: true, rideRange: [-55, 40] });
+SU('dragcoil', 'Strange Engineering', 'Drag coilovers (soft front / anti-squat rear)', 2600, -4, 25, 0.01, { adjustable: true, rideRange: [-60, 40], desc: 'Drag-valved dampers with a wide height range for setting launch stance.' });
+SU('air3h', 'Air Lift', '3H height-sensing air management', 5200, 20, 55, -0.005, { adjustable: true, rideRange: [-130, 60], desc: 'Ride-height sensors hold any height you set, from airing out on the frame to well above stock.' });
+SU('accuair', 'AccuAir', 'Endo-VT air suspension', 4600, 19, 60, -0.008, { adjustable: true, rideRange: [-120, 70] });
+SU('hydros', 'Black Magic', 'Lowrider hydraulics (4 pumps)', 6500, 55, 40, -0.06, { adjustable: true, rideRange: [-160, 90], truckOk: true, desc: 'Hydraulic cylinders at every corner: three-wheel motion not included. Heavy, and it handles like it.' });
+SU('belltech', 'Belltech', '2"/4" drop kit (trucks)', 1150, -5, 75, 0.02, { truckOnly: true, adjustable: true, rideRange: [-25, 25] });
+SU('lift2', 'Rough Country', '2" leveling kit', 380, 4, -50, -0.01, { truckOnly: true });
+SU('lift45', 'Zone Offroad', '4.5" suspension lift', 1700, 24, -114, -0.05, { truckOnly: true });
+SU('lift8', 'BDS', '8" suspension lift', 3600, 45, -203, -0.09, { truckOnly: true });
 SU('lift3', 'Rough Country', '3" suspension lift', 950, 15, -76, -0.03, { truckOnly: true });
 SU('lift6', 'Rough Country', '6" suspension lift', 2400, 32, -152, -0.07, { truckOnly: true });
 SU('fox30', 'Fox', '3.0 Live Valve coilovers', 3200, 4, -25, 0.03, { truckOnly: true, adjustable: true, rideRange: [-50, 40] });
@@ -787,6 +820,35 @@ const WHEEL_MODELS = [
   ['apexec7', 'Apex', 'EC-7', 'flow formed', 'spoke', 7, '#3e4247', 330, 8.0, [17, 18, 19], P5],
   ['xdgrenade', 'XD Series', 'Grenade', 'cast', 'rally', 8, '#1f1f1f', 240, 14.8, [17, 18, 20], TRUCK],
   ['kmcmesa', 'KMC', 'Mesa forged', 'forged', 'star', 6, '#9a9fa6', 520, 12.4, [17, 18, 20], TRUCK],
+  ['te37sl', 'Volk Racing', 'TE37SL', 'forged', 'concave', 6, '#2b2d30', 760, 6.6, [15, 16, 17, 18, 19], [...P4, ...P5]],
+  ['g025', 'Volk Racing', 'G025', 'forged', 'y', 7, '#46494d', 820, 7.3, [18, 19, 20], P5],
+  ['57dr', 'Gram Lights', '57DR', 'cast', 'spoke', 6, '#0e0e0e', 430, 8.0, [15, 16, 17, 18, 19], [...P4, ...P5]],
+  ['crkiwami', 'Work', 'Emotion CR Kiwami', 'cast', 'multi', 11, '#e6e6e6', 520, 7.7, [15, 16, 17, 18], [...P4, ...P5]],
+  ['vsxx', 'Work', 'VS-XX 3P', '3-piece', 'multi', 10, '#c9ccd1', 1380, 9.0, [17, 18, 19, 20], P5],
+  ['gtx01', 'SSR', 'GTX01', 'flow formed', 'directional', 5, '#cfd2d6', 380, 8.1, [16, 17, 18, 19], [...P4, ...P5]],
+  ['mk1', 'SSR', 'Mk-I', '3-piece', 'fuchs', 4, '#d9d9d9', 980, 8.6, [14, 15, 16, 17], P4],
+  ['pf01', 'Enkei', 'PF01', 'MAT cast', 'split', 5, '#5b6066', 290, 7.6, [15, 16, 17, 18], [...P4, ...P5]],
+  ['superturismo', 'OZ Racing', 'Superturismo GT', 'cast', 'spoke', 6, '#191919', 330, 8.4, [15, 16, 17, 18, 19], [...P4, ...P5]],
+  ['dekagram', 'Konig', 'Dekagram', 'flow formed', 'multi', 10, '#4a4e53', 220, 8.3, [15, 16, 17, 18, 19], [...P4, ...P5]],
+  ['xt206r', 'Cosmis', 'XT-206R', 'cast', 'concave', 6, '#6e7277', 190, 9.6, [17, 18, 19, 20], P5],
+  ['e88', 'BBS', 'E88 3-piece', '3-piece', 'cross', 10, '#bfc1c4', 1900, 9.4, [17, 18, 19, 20], P5],
+  ['superrs', 'BBS', 'Super RS', '2-piece forged', 'cross', 8, '#1e1f21', 1450, 8.9, [17, 18, 19, 20], P5],
+  ['rs8', 'Watanabe', 'RS8 8-spoke', 'cast', 'fuchs', 8, '#c4a46a', 600, 7.0, [13, 14, 15, 16], P4],
+  ['minilite', 'Minilite', 'Classic 8-spoke', 'cast', 'dish', 8, '#b3b6ba', 380, 7.6, [13, 14, 15, 16], [...P4, '5x114.3', '5x120']],
+  ['campag', 'Campagnolo', 'Elektron 5-star', 'cast magnesium', 'star', 5, '#9c8a63', 920, 6.9, [15, 16, 17], [...P4, ...P5]],
+  ['ronalturbo', 'Ronal', 'Turbo fan', 'cast', 'turbofan', 20, '#e8e8e8', 520, 9.0, [15, 16, 17, 18], [...P4, ...P5]],
+  ['gtc', 'Racing Hart', 'Type C 3-piece', '3-piece', 'tri', 5, '#bcbfc3', 1100, 8.6, [15, 16, 17, 18], [...P4, ...P5]],
+  ['ga1r', 'Forgeline', 'GA1R', 'monoblock forged', 'tri', 6, '#2c2e31', 1550, 7.9, [18, 19, 20], [...P5, '6x114.3']],
+  ['cvt', 'Vossen', 'CVT', 'cast', 'directional', 10, '#6a6f75', 450, 10.2, [18, 19, 20, 21, 22], [...P5, '6x114.3']],
+  ['cragar', 'Cragar', 'S/S Super Sport', 'chrome steel', 'slot', 5, '#e9ecef', 210, 10.6, [14, 15, 17], [...P5, '5x127']],
+  ['saltflat', 'Weld', 'RT-S S71 drag', 'forged drag', 'split', 5, '#2a2a2a', 640, 7.2, [15, 16, 17, 18], [...P5, '5x127']],
+  ['alumastar', 'Weld', 'AlumaStar 2.0 skinny drag front', 'forged drag', 'slot', 10, '#d9d9d9', 690, 5.4, [15, 17], P5],
+  ['vseries', 'Weld', 'V-Series drag beadlock', 'forged drag', 'beadlock', 6, '#1b1b1b', 980, 9.1, [15, 17], [...P5, '5x127']],
+  ['convopro', 'Center Line', 'Convo Pro drag', 'cast drag', 'star', 5, '#e2e2e2', 280, 8.4, [15, 17, 18], [...P5, '5x127']],
+  ['m701', 'Method', '701 Trail', 'cast', 'beadlock', 6, '#3f4246', 300, 14.2, [17, 18, 20], TRUCK],
+  ['covert', 'Fuel Off-Road', 'Covert', 'cast', 'split', 6, '#2a2a2a', 290, 15.0, [17, 18, 20], TRUCK],
+  ['arsenal', 'Black Rhino', 'Arsenal', 'cast', 'beadlock', 8, '#5e5340', 310, 15.8, [17, 18, 20], TRUCK],
+  ['sidebiter', 'Mickey Thompson', 'Sidebiter Lock', 'cast', 'star', 8, '#9ea3a8', 330, 14.6, [17, 18, 20], TRUCK],
   ['mr305', 'Method', 'MR305 NV', 'cast', 'spoke', 6, '#1c1c1c', 260, 13.5, [17, 18, 20], TRUCK],
   ['rebel', 'Fuel Off-Road', 'Rebel 6', 'cast', 'beadlock', 6, '#2b2b2b', 330, 15.5, [17, 18, 20], TRUCK],
 ];

@@ -125,7 +125,10 @@
   "license": "CC Attribution",
   "author": "supercarmodels",
   "url": "https://sketchfab.com/3d-models/none-7901879d9ae94581931886b20fc7f100",
-  "faces": 52174
+  "faces": 52174,
+  "flags": [
+   "--flip"
+  ]
  },
  "dc2": {
   "uid": "db88d2cc21654a4eb73ec9f0c2a7e113",
@@ -269,7 +272,10 @@
   "license": "CC Attribution-NonCommercial-ShareAlike",
   "author": "ddiaz-design",
   "url": "https://sketchfab.com/3d-models/none-b45ae79c8ec840a98fae0581af4be396",
-  "faces": 138151
+  "faces": 138151,
+  "flags": [
+   "--flip"
+  ]
  },
  "gt4_718": {
   "uid": "357999b7e87642e38062623127a61bb2",
@@ -309,7 +315,10 @@
   "license": "CC Attribution",
   "author": "ddiaz-design",
   "url": "https://sketchfab.com/3d-models/none-1d1344847d8540e9a6a7f21184ab7769",
-  "faces": 175551
+  "faces": 175551,
+  "flags": [
+   "--flip"
+  ]
  },
  "m720s": {
   "uid": "56dff31093154a788f103fa39be90dc2",
@@ -349,7 +358,10 @@
   "license": "CC Attribution-NonCommercial-ShareAlike",
   "author": "ddiaz-design",
   "url": "https://sketchfab.com/3d-models/none-ea5927b1a3f04c2589ec80cb1113675e",
-  "faces": 34771
+  "faces": 34771,
+  "flags": [
+   "--flip"
+  ]
  },
  "golfr": {
   "uid": "93f2b79c56c14b269fbe914205c4712e",
@@ -494,7 +506,10 @@
   "license": "CC Attribution",
   "author": "adrianaflak09",
   "url": "https://sketchfab.com/3d-models/none-8b65abfa08a84a88979ee2bfdae9a5c8",
-  "faces": 54308
+  "faces": 54308,
+  "flags": [
+   "--flip"
+  ]
  },
  "evo6": {
   "uid": "d565cdb23b864308acc9678baa05d5d3",

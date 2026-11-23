@@ -384,7 +384,7 @@ export function topSampler(shell, x0, x1, z0, z1) {
   const tris = [];
   shell.traverse(o => {
     if (!o.isMesh || !o.geometry.attributes.position) return;
-    if ([].concat(o.material).every(m => m.transparent)) return;
+    if ([].concat(o.material).every(m => m.transparent || m.transmission > 0)) return;   // glass (incl. transmission glass on high)
     M.multiplyMatrices(inv, o.matrixWorld);
     const pos = o.geometry.attributes.position, idx = o.geometry.index, n = idx ? idx.count : pos.count;
     for (let t = 0; t < n; t += 3) {
@@ -410,11 +410,16 @@ export function topSampler(shell, x0, x1, z0, z1) {
 }
 
 // one louvre panel conforming to the body at (xc, z0..z1), width wd
-function addLouvre(g, shell, xc, z0, z1, wd, MM) {
+function addLouvre(g, shell, xc, z0, z1, wd, MM, maxY = null) {
   const xa = xc - wd / 2, xb = xc + wd / 2;
   const S = topSampler(shell, xa - 0.02, xb + 0.02, z0 - 0.02, z1 + 0.02);
-  const ok = [[xa, z0], [xb, z0], [xa, z1], [xb, z1], [xc, (z0 + z1) / 2]].every(([x, z]) => S(x, z) != null);
-  if (!ok) return;
+  // must sit on one smooth panel (a slope is fine): a step or gap (cowl / windshield base / A-pillar / panel hole)
+  // anywhere under the vent means wrong spot
+  const NZ = 6, cols = [xa, xc, xb].map(x => Array.from({ length: NZ + 1 }, (_, j) => S(x, z0 + (z1 - z0) * j / NZ)));
+  if (cols.some(c => c.some(y => y == null))) return false;
+  for (const c of cols) for (let j = 1; j < NZ; j++) if (Math.abs(c[j - 1] - 2 * c[j] + c[j + 1]) > 0.02) return false;
+  for (let j = 0; j <= NZ; j++) if (Math.max(cols[0][j], cols[1][j], cols[2][j]) - Math.min(cols[0][j], cols[1][j], cols[2][j]) > 0.07) return false;
+  if (maxY != null && Math.max(...cols.flat()) > maxY) return false;
   const y = (x, z) => S(x, z) ?? S(xc, z) ?? 0;
   // conformal quad grid over [u0,u1]x[v0,v1] (x, z) lifted by `off`, optional per-row lift for blades
   const patch = (u0, u1, v0, v1, nu, nv, off, mat, lift) => {
@@ -438,8 +443,84 @@ function addLouvre(g, shell, xc, z0, z1, wd, MM) {
     const zf = z1 - 0.01 - k * pitch, zr = zf - 0.024;
     patch(xa + 0.002, xb - 0.002, zr, zf, NU, 2, 0.0025, MM.louvreBlade, t => 0.013 * (1 - t));
   }
+  return true;
 }
 
+// all opaque body vertices of the shell in shell space + their normals: { p: [x,y,z,...], n: [nx,ny,nz,...] }
+export function shellVerts(shell, wheels = null) {
+  shell.updateMatrixWorld(true);
+  const inv = new THREE.Matrix4().copy(shell.matrixWorld).invert(), M = new THREE.Matrix4(), NM = new THREE.Matrix3(), p = [], n = [];
+  const A = new THREE.Vector3(), B = new THREE.Vector3(), C = new THREE.Vector3(), nA = new THREE.Vector3(), nB = new THREE.Vector3(), nC = new THREE.Vector3();
+  // low-poly bodies: big triangles around the arches get filled with extra sample points (4 cm spacing)
+  const nearWheel = (x, y, z) => wheels && wheels.some(w => Math.sign(w.x) === Math.sign(x) && Math.abs(x) > Math.abs(w.x) - 0.3 && Math.hypot(y - (w.y ?? w.r), z - w.z) < w.r + 0.55);
+  shell.traverse(o => {
+    if (!o.isMesh || !o.visible) return;
+    if ([].concat(o.material).every(m => m.transparent || m.transmission > 0)) return;
+    M.multiplyMatrices(inv, o.matrixWorld); NM.getNormalMatrix(M);
+    const P = o.geometry.attributes.position, N = o.geometry.attributes.normal, idx = o.geometry.index;
+    const get = (i, v, nv) => { v.fromBufferAttribute(P, i).applyMatrix4(M); if (N) nv.fromBufferAttribute(N, i).applyMatrix3(NM).normalize(); else nv.set(0, 0, 0); };
+    for (let i = 0; i < P.count; i++) { get(i, A, nA); p.push(A.x, A.y, A.z); n.push(nA.x, nA.y, nA.z); }
+    if (!wheels) return;
+    const nt = idx ? idx.count / 3 : P.count / 3;
+    for (let t = 0; t < nt; t++) {
+      const i0 = idx ? idx.getX(t * 3) : t * 3, i1 = idx ? idx.getX(t * 3 + 1) : t * 3 + 1, i2 = idx ? idx.getX(t * 3 + 2) : t * 3 + 2;
+      get(i0, A, nA); get(i1, B, nB); get(i2, C, nC);
+      const e = Math.max(A.distanceTo(B), B.distanceTo(C), C.distanceTo(A)); if (e < 0.06) continue;
+      if (!nearWheel((A.x + B.x + C.x) / 3, (A.y + B.y + C.y) / 3, (A.z + B.z + C.z) / 3)) continue;
+      const m = Math.min(30, Math.ceil(e / 0.04));
+      for (let i = 0; i <= m; i++) for (let j = 0; j <= m - i; j++) {
+        const u = i / m, v = j / m, w = 1 - u - v;
+        p.push(A.x * u + B.x * v + C.x * w, A.y * u + B.y * v + C.y * w, A.z * u + B.z * v + C.z * w);
+        n.push(nA.x * u + nB.x * v + nC.x * w, nA.y * u + nB.y * v + nC.y * w, nA.z * u + nB.z * v + nC.z * w);
+      }
+    }
+  });
+  return { p: new Float32Array(p), n: new Float32Array(n) };
+}
+// The wheel-arch opening of one wheel, seen from the side: for each angle a (0 = forward, PI/2 = up, PI = back) the
+// distance from the wheel centre to the nearest OUTER-SKIN vertex (edge) and the skin's |x| there (outX).
+// Outer skin = facing outwards (normal.x towards this side) and the outermost surface locally;
+// the wheel-well liner and the arch lip's return flange face the wheel, so they don't count.
+export function measureArch(verts, w, s, wy, anyFacing = false) {
+  const { p: V, n: Nn } = verts;
+  const NB = 36, edge = new Float32Array(NB).fill(9), outX = new Float32Array(NB);
+  const xIn = Math.abs(w.x) - 0.25, dMin = w.r + 0.01, dMax = w.r + 0.42;
+  const bin = (dy, dz) => Math.min(NB - 1, Math.max(0, Math.floor(Math.atan2(Math.max(dy, 0), dz) / Math.PI * NB)));
+  const each = fn => { for (let i = 0; i < V.length; i += 3) { const x = V[i] * s; if (x < xIn || (anyFacing ? Math.abs(Nn[i]) : Nn[i] * s) < 0.55) continue; const dy = V[i + 1] - wy, dz = V[i + 2] - w.z; if (dy < -0.05) continue; fn(x, Math.hypot(dy, dz), bin(dy, dz)); } };
+  // per angle: the nearest vertex that is (within 5 cm) the outermost surface of the body just outside it - the liner
+  // and the lip's return flange sit inboard of the skin around them, so they're skipped
+  const bins = Array.from({ length: NB }, () => []);
+  each((x, d, k) => { if (d >= dMin && d <= dMax) bins[k].push(d, x); });
+  for (let k = 0; k < NB; k++) {
+    const b = bins[k], n = b.length / 2; if (!n) continue;
+    const ord = Array.from({ length: n }, (_, i) => i).sort((i, j) => b[i * 2] - b[j * 2]);
+    for (let a = 0; a < n; a++) {
+      const d = b[ord[a] * 2], x = b[ord[a] * 2 + 1];
+      let lm = x; for (let c = a + 1; c < n && b[ord[c] * 2] < d + 0.08; c++) lm = Math.max(lm, b[ord[c] * 2 + 1]);
+      if (x >= lm - 0.05) { edge[k] = d; outX[k] = lm; break; }
+    }
+  }
+  // bridge single / double empty bins (sparse meshes) from their neighbours
+  for (let k = 1; k < NB - 1; k++) if (edge[k] === 9) {
+    let a = k - 1, b = k + 1; while (b < NB - 1 && edge[b] === 9 && b - k < 2) b++;
+    if (edge[a] < 9 && edge[b] < 9) { const t = 1 / (b - a); edge[k] = edge[a] + (edge[b] - edge[a]) * t; outX[k] = outX[a] + (outX[b] - outX[a]) * t; }
+  }
+  const ok = k => edge[k] < w.r + 0.3;
+  const mid = Math.floor(NB / 2); if (!ok(mid)) return null;
+  let k0 = mid, k1 = mid;
+  while (k0 > 0 && ok(k0 - 1)) k0--;
+  while (k1 < NB - 1 && ok(k1 + 1)) k1++;
+  if (k1 - k0 < 8) return null;
+  // smooth: 5-bin median then 5-bin mean (seams, badges, mesh steps must not dent the flare)
+  const win = (arr, k, h) => { const o = []; for (let j = Math.max(k0, k - h); j <= Math.min(k1, k + h); j++) o.push(arr[j]); return o; };
+  const sm = arr => {
+    const med = Float32Array.from(arr), out = Float32Array.from(arr);
+    for (let k = k0; k <= k1; k++) { const o = win(arr, k, 2).sort((a, b) => a - b); med[k] = o[o.length >> 1]; }
+    for (let k = k0; k <= k1; k++) { const o = win(med, k, 2); out[k] = o.reduce((a, b) => a + b, 0) / o.length; }
+    return out;
+  };
+  return { k0, k1, edge: sm(edge), outX: sm(outX), NB };
+}
 // ---------- materials ----------
 let carbonTex = null;
 function carbonMap() {
@@ -537,7 +618,8 @@ export function deformWidebody(shellRoot, man, F, amt = 0.07) {
         const wy = w.y ?? w.r;
         const d = Math.hypot(v3.y - wy, v3.z - w.z);
         const f = 1 - THREE.MathUtils.smoothstep(d, w.r * 1.05, w.r * 2.1);
-        const below = v3.y < wy + w.r * 1.25 ? 1 : Math.max(0, 1 - (v3.y - wy - w.r * 1.25) / 0.12);
+        // fade out gently above the arch (a short ramp left a crease along low fender crowns, e.g. Huracán / C8)
+        const below = 1 - THREE.MathUtils.smoothstep(v3.y, wy + w.r * 1.15, wy + w.r * 1.15 + 0.3);
         const g = THREE.MathUtils.smoothstep(ax, inner, Math.abs(w.x) - 0.06);
         dx = Math.max(dx, amt * f * below * g);
       }
@@ -557,36 +639,114 @@ export function deformWidebody(shellRoot, man, F, amt = 0.07) {
 }
 
 // ---------- carbon panels: region mask injected into the paint shader ----------
+// Door skins are usually separate pieces of the model (there is a shut-line gap all round them). Find those pieces
+// near the estimated door zone and tag their vertices (attribute cfDoorA) so carbon doors follow the real door outline
+// instead of a rectangle. Returns [-x side found, +x side found]; a side without a separate door piece uses the box mask.
+function tagDoorPieces(shellRoot, paintMats, F, zone) {
+  shellRoot.updateMatrixWorld(true);
+  const inv = new THREE.Matrix4().copy(shellRoot.matrixWorld).invert(), M = new THREE.Matrix4(), v = new THREE.Vector3();
+  const zc = (zone.z0 + zone.z1) / 2;
+  const sides = [0, 0];   // door piece found on the -x / +x side
+  const meshes = [];
+  shellRoot.traverse(o => { if (o.isMesh && [].concat(o.material).some(m => paintMats.includes(m))) meshes.push(o); });
+  const allPos = meshes.map(o => {
+    const P = o.geometry.attributes.position, a = new Float32Array(P.count * 3);
+    M.multiplyMatrices(inv, o.matrixWorld);
+    for (let i = 0; i < P.count; i++) { v.fromBufferAttribute(P, i).applyMatrix4(M); a[i * 3] = v.x; a[i * 3 + 1] = v.y; a[i * 3 + 2] = v.z; }
+    return a;
+  });
+  for (const [mi, o] of meshes.entries()) {
+    const g = o.geometry, P = g.attributes.position, idx = g.index;
+    M.multiplyMatrices(inv, o.matrixWorld);
+    const cacheKey = M.elements.map(e => e.toFixed(4)).join(',') + zone.z0.toFixed(3) + zone.z1.toFixed(3);
+    if (g.userData.cfDoorKey === cacheKey) { sides[0] |= g.userData.cfDoorSides[0]; sides[1] |= g.userData.cfDoorSides[1]; continue; }
+    const nv = P.count, nt = idx ? idx.count / 3 : nv / 3, vi = (t, j) => idx ? idx.getX(t * 3 + j) : t * 3 + j;
+    // weld by position (pieces that only share positions, not indices, are still one piece)
+    const pos = new Float32Array(nv * 3), key = new Int32Array(nv), map = new Map();
+    for (let i = 0; i < nv; i++) {
+      v.fromBufferAttribute(P, i).applyMatrix4(M); pos[i * 3] = v.x; pos[i * 3 + 1] = v.y; pos[i * 3 + 2] = v.z;
+      const k = Math.round(v.x * 500) + ',' + Math.round(v.y * 500) + ',' + Math.round(v.z * 500);
+      let id = map.get(k); if (id === undefined) { id = map.size; map.set(k, id); } key[i] = id;
+    }
+    const par = new Int32Array(map.size); for (let i = 0; i < par.length; i++) par[i] = i;
+    const find = a => { while (par[a] !== a) { par[a] = par[par[a]]; a = par[a]; } return a; };
+    for (let t = 0; t < nt; t++) { const a = find(key[vi(t, 0)]), b = find(key[vi(t, 1)]), c = find(key[vi(t, 2)]); par[a] = b; par[find(c)] = b; }
+    const comps = new Map();
+    for (let i = 0; i < nv; i++) {
+      const r = find(key[i]); let c = comps.get(r);
+      if (!c) comps.set(r, c = { n: 0, x0: 1e9, x1: -1e9, y0: 1e9, y1: -1e9, z0: 1e9, z1: -1e9 });
+      const x = pos[i * 3], y = pos[i * 3 + 1], z = pos[i * 3 + 2]; c.n++;
+      if (x < c.x0) c.x0 = x; if (x > c.x1) c.x1 = x; if (y < c.y0) c.y0 = y; if (y > c.y1) c.y1 = y; if (z < c.z0) c.z0 = z; if (z > c.z1) c.z1 = z;
+    }
+    const doorRoots = new Set(), mySides = [0, 0];
+    for (const [r, c] of comps) {
+      const len = c.z1 - c.z0, h = c.y1 - c.y0, side = Math.min(Math.abs(c.x0), Math.abs(c.x1)), sameSide = c.x0 * c.x1 > 0;
+      if (c.n >= 60 && sameSide && side > F.W * 0.28 && Math.max(Math.abs(c.x0), Math.abs(c.x1)) > F.W * 0.38
+        && len > 0.6 && len < 1.9 && h > 0.3 && h < 1.0 && c.z0 < zc && c.z1 > zc
+        && c.z0 > zone.z0 - 0.45 && c.z1 < zone.z1 + 0.45 && c.y1 <= zone.y1 + 0.15) { doorRoots.add(r); mySides[c.x0 > 0 ? 1 : 0] = 1; }
+    }
+    // a hidden inner door card / frame can match too: keep only pieces that are the outer skin there (nothing else
+    // in the mesh sticks out further at the piece's middle)
+    for (const r of [...doorRoots]) {
+      const c = comps.get(r), sgn = c.x0 > 0 ? 1 : -1, out = Math.max(Math.abs(c.x0), Math.abs(c.x1));
+      const zm0 = c.z0 + 0.25 * (c.z1 - c.z0), zm1 = c.z1 - 0.25 * (c.z1 - c.z0), ym0 = c.y0 + 0.25 * (c.y1 - c.y0), ym1 = c.y1 - 0.25 * (c.y1 - c.y0);
+      let other = 0;
+      allPos.forEach((ap, mj) => {
+        for (let i = 0, n = ap.length / 3; i < n; i++) {
+          const x = ap[i * 3] * sgn, y = ap[i * 3 + 1], z = ap[i * 3 + 2];
+          if (x > other && z > zm0 && z < zm1 && y > ym0 && y < ym1 && (mj !== mi || find(key[i]) !== r)) other = x;
+        }
+      });
+      if (other > out + 0.004) { doorRoots.delete(r); mySides[sgn > 0 ? 1 : 0] = 0; }
+    }
+    for (const r of doorRoots) mySides[comps.get(r).x0 > 0 ? 1 : 0] = 1;
+    const attr = new Float32Array(nv);
+    if (doorRoots.size) for (let i = 0; i < nv; i++) if (doorRoots.has(find(key[i]))) attr[i] = 1;
+    g.setAttribute('cfDoorA', new THREE.BufferAttribute(attr, 1));
+    g.userData.cfDoorKey = cacheKey; g.userData.cfDoorSides = mySides;
+    sides[0] |= mySides[0]; sides[1] |= mySides[1];
+  }
+  return sides;
+}
 export function applyCarbonPanels(paintMats, shellRoot, F, man, panels, livery = {}) {
   const stripes = livery.stripes || 'none';
   if (!panels.length && stripes === 'none') return;
   const ws = man.wheels || [];
   const zF = ws.length ? (ws[0].z + ws[1].z) / 2 : F.L * 0.3, zR = ws.length ? (ws[2].z + ws[3].z) / 2 : -F.L * 0.3, r = ws[0]?.r || 0.32;
+  // door skin runs up to the window line (glass isn't paint, so the mask can't spill onto it); low-nosed cars have a
+  // belt line well above the hood
+  const doorTop = Math.max(F.hoodY + 0.12, F.roofY - 0.24);
   const uniforms = {
     shellInv: { value: new THREE.Matrix4() },
     cfOn: { value: new THREE.Vector4(panels.includes('hood') ? 1 : 0, panels.includes('roof') ? 1 : 0, panels.includes('trunk') ? 1 : 0, panels.includes('doors') ? 1 : 0) },
     cfHood: { value: new THREE.Vector4(F.cowl + 0.02, F.L / 2 - 0.12, F.hoodY - 0.16, F.W * 0.29) },     // z0, z1, yMin, halfW
     cfHoodMax: { value: (() => { let m = 0; for (let i = 0; i <= 8; i++) { const z = F.cowl + (F.L / 2 - F.cowl) * i / 8; m = Math.max(m, F.topAt(0, z)); } return m + 0.03; })() },   // fenders that rise above the hood centreline stay painted
     cfRoof: { value: new THREE.Vector4(F.roofR, F.roofF, F.roofY - 0.1, F.W * 0.36) },
-    cfTrunk: { value: new THREE.Vector4(F.tail + 0.04, F.deckZ - 0.02, F.deckY - 0.2, F.W * 0.38) },
-    // 2-door cars: one long door that ends at the B-pillar; 4-door: front + rear door, ending ahead of the rear arch
-    cfDoor: { value: new THREE.Vector4(livery.fourDoor ? zR + r + 0.12 : Math.max(zR + r + 0.12, zF - r - 0.1 - Math.min(1.3, Math.max(1.0, 0.46 * (zF - zR)))), zF - r - 0.1, 0.28, F.hoodY + 0.12) },
+    // mid / rear-engine cars: the rear lid is the engine cover between the rear fenders, which sit just as high
+    cfTrunk: { value: new THREE.Vector4(F.tail + 0.04, F.deckZ - 0.02, F.deckY - 0.2, F.W * (livery.midRear ? 0.24 : 0.38)) },
+    // 2-door cars: one long door that ends at the B-pillar (mid-engine doors run further back, to the side intake); 4-door: front + rear door, ending ahead of the rear arch
+    cfDoor: { value: new THREE.Vector4(livery.fourDoor ? zR + r + 0.12 : Math.max(zR + r + (livery.midRear ? 0.0 : 0.12), zF - r - 0.1 - (livery.midRear ? Math.min(1.45, Math.max(1.0, 0.515 * (zF - zR))) : Math.min(1.3, Math.max(1.0, 0.46 * (zF - zR))))), zF - r - 0.1, 0.28, doorTop) },
+    cfDoorMode: { value: new THREE.Vector2(0, 0) },   // per side (-x, +x): 1 = use the tagged door pieces instead of the box
     cfMap: { value: carbonMap() },
     // stripes: x = racing (0/1), y = side (0/1), z = racing band inner half-gap, w = racing band width; stripe colour; side band (y0, y1, z0, z1)
     stOn: { value: new THREE.Vector4(stripes === 'racing' || stripes === 'both' ? 1 : 0, stripes === 'side' || stripes === 'both' ? 1 : 0, F.W * 0.035, F.W * 0.085) },
     stCol: { value: new THREE.Color(livery.stripeColor || '#ffffff') },
     stSide: { value: new THREE.Vector4(Math.max(0.3, F.hoodY - 0.22), Math.max(0.36, F.hoodY - 0.14), F.tail + 0.25, F.L / 2 - 0.3) },
   };
+  if (panels.includes('doors')) {
+    const D = uniforms.cfDoor.value;
+    uniforms.cfDoorMode.value.fromArray(tagDoorPieces(shellRoot, paintMats, F, { z0: D.x, z1: D.y, y1: D.w }));
+  }
   for (const m of paintMats) {
     m.userData.cf = uniforms;
     m.onBeforeCompile = sh => {
       Object.assign(sh.uniforms, uniforms);
       sh.vertexShader = sh.vertexShader
-        .replace('#include <common>', '#include <common>\nuniform mat4 shellInv; varying vec3 vShell; varying vec3 vShellN;')
-        .replace('#include <project_vertex>', '#include <project_vertex>\nvec4 cfW = modelMatrix * vec4(transformed, 1.0); vShell = (shellInv * cfW).xyz; vShellN = normalize(mat3(shellInv) * mat3(modelMatrix) * objectNormal);');
+        .replace('#include <common>', '#include <common>\nuniform mat4 shellInv; varying vec3 vShell; varying vec3 vShellN; attribute float cfDoorA; varying float vCfDoor;')
+        .replace('#include <project_vertex>', '#include <project_vertex>\nvec4 cfW = modelMatrix * vec4(transformed, 1.0); vShell = (shellInv * cfW).xyz; vShellN = normalize(mat3(shellInv) * mat3(modelMatrix) * objectNormal); vCfDoor = cfDoorA;');
       sh.fragmentShader = sh.fragmentShader
         .replace('#include <common>', `#include <common>
-uniform vec4 cfOn, cfHood, cfRoof, cfTrunk, cfDoor, stOn, stSide; uniform float cfHoodMax; uniform vec3 stCol; uniform sampler2D cfMap; varying vec3 vShell; varying vec3 vShellN; float cfM; float stM;
+uniform vec4 cfOn, cfHood, cfRoof, cfTrunk, cfDoor, stOn, stSide; uniform float cfHoodMax; uniform vec2 cfDoorMode; varying float vCfDoor; uniform vec3 stCol; uniform sampler2D cfMap; varying vec3 vShell; varying vec3 vShellN; float cfM; float stM;
 float stMask(){
   vec3 p = vShell, n = normalize(vShellN); float m = 0.0; float ax = abs(p.x);
   if (stOn.x > 0.5 && ax > stOn.z && ax < stOn.z + stOn.w && (n.y > 0.12 || abs(n.z) > 0.5)) m = 1.0;
@@ -598,15 +758,15 @@ float cfMask(){
   if (cfOn.x > 0.5 && p.z > cfHood.x && p.z < cfHood.y && p.y > cfHood.z && p.y < cfHoodMax && abs(p.x) < cfHood.w && n.y > 0.3) m = 1.0;
   if (cfOn.y > 0.5 && p.z > cfRoof.x && p.z < cfRoof.y && p.y > cfRoof.z && abs(p.x) < cfRoof.w && n.y > 0.35) m = 1.0;
   if (cfOn.z > 0.5 && p.z > cfTrunk.x && p.z < cfTrunk.y && p.y > cfTrunk.z && abs(p.x) < cfTrunk.w && n.y > 0.25) m = 1.0;
-  if (cfOn.w > 0.5 && p.z > cfDoor.x && p.z < cfDoor.y && p.y > cfDoor.z && p.y < cfDoor.w && abs(n.x) > 0.55) m = 1.0;
+  if (cfOn.w > 0.5 && ((p.x > 0.0 ? cfDoorMode.y : cfDoorMode.x) > 0.5 ? vCfDoor > 0.5 : (p.z > cfDoor.x && p.z < cfDoor.y && p.y > cfDoor.z && p.y < cfDoor.w && abs(n.x) > 0.55))) m = 1.0;
   return m;
 }
-vec3 cfCol(){ vec3 p = vShell, n = abs(normalize(vShellN)); vec2 uv = n.y > 0.5 ? p.xz : (n.x > 0.5 ? p.zy : p.xy); return texture2D(cfMap, uv * 9.0).rgb; }`)
+vec3 cfCol(){ vec3 p = vShell, n = abs(normalize(vShellN)); vec2 uv = n.y > 0.5 ? p.xz : (n.x > 0.5 ? p.zy : p.xy); return texture2D(cfMap, uv * 5.0).rgb * 1.7; }   // coarse enough to read as weave at viewing distance; lifted so it is not a black void`)
         .replace('#include <map_fragment>', '#include <map_fragment>\nstM = stMask(); diffuseColor.rgb = mix(diffuseColor.rgb, stCol, stM);\ncfM = cfMask(); diffuseColor.rgb = mix(diffuseColor.rgb, cfCol(), cfM);')
         .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, 0.36, cfM);')
-        .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nmetalnessFactor = mix(metalnessFactor, 0.25, cfM);');
+        .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nmetalnessFactor = mix(metalnessFactor, 0.1, cfM);');
     };
-    m.customProgramCacheKey = () => 'carbon-panels-st';
+    m.customProgramCacheKey = () => 'carbon-panels-st2';
     m.needsUpdate = true;
   }
   // keep shellInv current (the car moves): refresh just before any painted mesh renders
@@ -675,7 +835,8 @@ export function addRealParts(ctx) {
     const lips = [];
     for (const x of xs(W * 0.34, 15)) {
       const zf = F.frontZ(x, 1.0); if (zf == null) continue;
-      let m = 9; for (let d = 0.01; d <= 0.15; d += 0.02) m = Math.min(m, F.lowAt(x, zf - d));
+      // the bumper face's bottom edge (first 7 cm): the plate sits flush against it, no gap under the fascia
+      let m = 9; for (let d = 0.01; d <= 0.07; d += 0.02) m = Math.min(m, F.lowAt(x, zf - d));
       if (m < 8) lips.push(m);
     }
     lips.sort((a, b) => a - b);
@@ -692,24 +853,21 @@ export function addRealParts(ctx) {
     if (edge.length > 4) {
       const e2 = edge.map(([x, z]) => [x, z + fwd]);
       const pl = mesh(outlinePlate(e2, back + fwd, isLip ? 0.012 : 0.009), isLip ? MM.satin : MM.carbonMatte);
-      pl.position.y = y - (isLip ? 0.012 : 0.016);
+      pl.position.y = y - (isLip ? 0.012 : 0.009) - 0.003;   // plate top (thickness + bevel) touches the fascia
       g.add(pl);
-      if (!isLip) {
-        // short support rods from the splitter's leading edge to the bumper face
-        for (const s of [-1, 1]) {
-          // tucked close to the bumper face, angled up into the bumper (hidden end bolts behind the fascia)
-          const x = s * W * 0.22, zb = F.frontZ(x, y + 0.1), z0 = F.frontZ(x, y + 0.03);
-          if (zb == null || z0 == null) continue;
-          g.add(mesh(tube([new THREE.Vector3(x, y - 0.004, Math.min(z0 + 0.03, zb + 0.06)), new THREE.Vector3(x, y + 0.09, zb - 0.02)], 0.005), MM.alu));
-        }
-      }
       if (front.model === 'canards') {
         // two dive planes per side on the bumper corners, flush with the bodywork
         const fin = new THREE.Shape(); fin.moveTo(0, 0); fin.lineTo(0.13, 0.03); fin.lineTo(0.13, 0.075); fin.lineTo(0, 0.12); fin.closePath();
         const fg = new THREE.ExtrudeGeometry(fin, { depth: 0.005, bevelEnabled: true, bevelThickness: 0.0015, bevelSize: 0.0015, bevelSegments: 1 });
         fg.rotateX(Math.PI / 2); // shape x -> outward, shape y -> -z (back)
+        // on the bumper corner between the front of the wheel arch and the nose: the fin runs ~10 cm back from zc, so
+        // it has to start at least that far ahead of the tire (short-nosed cars used to get them on the wheel)
+        const zArch = wf ? wf.z + tR + 0.06 : -Infinity;
         for (const s of [-1, 1]) for (const dy of [0.1, 0.2]) {
-          const yy = y + dy, zc = (F.frontZ(s * W * 0.4, yy + 0.04) ?? L / 2) - 0.1 - dy * 0.15;
+          const yy = y + dy, zCorner = (F.frontZ(s * W * 0.4, yy + 0.04) ?? L / 2) - 0.1 - dy * 0.15;
+          const zNose = F.frontZ(0, yy) ?? L / 2;
+          const zc = Math.max(zCorner, zArch + 0.11);
+          if (zc > zNose - 0.08) continue;   // no room ahead of the wheel on this car
           const xa = F.surfX(s, zc + 0.02, yy) || F.sideX(zc, yy), xb = F.surfX(s, zc - 0.1, yy) || xa;
           const c = mesh(fg, MM.carbon);
           c.scale.set(s * 0.75, 1, 0.8);                                  // ~10 cm out, 10 cm long
@@ -783,7 +941,7 @@ export function addRealParts(ctx) {
       // span from the body's width at the trunk (W includes the mirrors), never past the rear fenders
       const zw = hatch ? F.roofR : (F.tail + F.deckZ) / 2;
       const rearW = Math.max(F.surfX(1, zw, F.deckY - 0.12), F.surfX(-1, zw, F.deckY - 0.12)) * 2 || W * 0.9;
-      const span = Math.min(1.8, S.span * Math.min(W, rearW + 0.02));
+      const span = Math.min(1.8, S.span * Math.min(W, rearW + 0.02), rearW - 0.03);   // endplates stay inside the rear fenders
       // mounting point: trunk lid near the trailing edge (or the hatch top on hatchbacks)
       let zm = hatch ? F.roofR - 0.05 : Math.max(F.tail + 0.16, (F.tail + F.deckZ) / 2 - 0.05);
       // chassis-mount (time attack): uprights come up through the trunk lid near its trailing edge, element set back
@@ -792,7 +950,8 @@ export function addRealParts(ctx) {
       const baseY = Math.max(F.topAt(ux, zm), F.topAt(-ux, zm));
       // hatchbacks: the wing sits just above the hatch's trailing roof edge (measured surface, short uprights)
       const roofHatch = hatch;
-      const wy = baseY + (roofHatch ? Math.min(S.h, wing.model === 'bigwing' ? 0.22 : 0.1) : S.h);
+      // tall wings top out around roof height (clean air without towering over the car)
+      const wy = baseY + (roofHatch ? Math.min(S.h, wing.model === 'bigwing' ? 0.22 : 0.1) : Math.min(S.h, Math.max(0.12, F.roofY + (wing.model === 'bigwing' ? 0.06 : 0) - baseY)));
       const wz = wing.model === 'bigwing' ? (hatch ? zm - 0.12 : F.tail - 0.03) : zm - (wing.model === 'swan' && !hatch ? 0.13 : 0.02);
       const elem = new THREE.Group(); elem.position.set(0, wy, wz); elem.rotation.x = ang; g.add(elem);
       const wm = wing.model === 'lowwing' ? panelPaint(ctx.paint, ctx.paintTint) : MM.carbon;
@@ -825,7 +984,7 @@ export function addRealParts(ctx) {
           // tapered plate upright from the lid (wide foot) to the element's underside, leaning back to where it sits
           const yb = F.topAt(x, zm);
           const hgt = Math.max(0.02, wy - yb - 0.01), lean = zm - wz;   // plate x maps to -z
-          const foot = wing.model === 'bigwing' ? 0.075 : 0.05, head = wing.model === 'bigwing' ? 0.045 : 0.035;
+          const foot = wing.model === 'bigwing' ? 0.055 : 0.045, head = wing.model === 'bigwing' ? 0.035 : 0.03;
           const u = mesh(plate([[-foot, 0], [foot, 0], [lean + head, hgt], [lean - head * 1.6, hgt]], wing.model === 'lowwing' ? 0.03 : wing.model === 'bigwing' ? 0.01 : 0.008), wing.model === 'lowwing' ? panelPaint(ctx.paint, ctx.paintTint) : MM.alu);
           u.position.set(x, yb - 0.005, zm); g.add(u);
           if (wing.model !== 'lowwing') {   // base plate bolted to the lid
@@ -843,34 +1002,48 @@ export function addRealParts(ctx) {
     const wP = Math.min(0.32, W * 0.17), xP = W * 0.155;
     const spots = [[xP, zc + hl * 0.42, zc + hl * 0.7, wP], [-xP, zc + hl * 0.42, zc + hl * 0.7, wP]];
     if (man.wheels) for (const w of man.wheels.filter(w => w.front)) spots.push([w.x - Math.sign(w.x) * 0.1, w.z - 0.2, w.z + 0.1, 0.15]);
-    for (const [xc, z0, z1, wd] of spots) addLouvre(g, ctx.shell, xc, z0, z1, wd, MM);
+    // slide each vent forward (towards the nose) until it sits on a clean painted panel below the windshield
+    const maxY = F.hoodY + 0.14;
+    for (const [xc, z0, z1, wd] of spots)
+      for (let d = 0; d <= 0.4 && z1 + d < zn - 0.05; d += 0.04) if (addLouvre(g, ctx.shell, xc, z0 + d, z1 + d, wd, MM, maxY)) break;
   }
 
   // ---- widebody overfenders: painted arch flares with rivets ----
-  if (ctx.wide && man.wheels) {
-    man.wheels.forEach((w, wi) => {
-      const s = Math.sign(w.x), wy = w.y ?? w.r, R = w.r + 0.075;
-      // swept profile (outward o, radial r'): flange on the body -> rolled outer edge -> lip over the tire
-      // swept profile (outward o, radial r') rooted on the measured (widened) body surface at each point of the arch
-      const prof = [[-0.006, 0.07], [0.012, 0.055], [0.03, 0.032], [0.04, 0.008], [0.036, -0.012], [0.018, -0.02], [-0.004, -0.02]];
-      const N = 28, pos = [], idx = [];
-      for (let k = 0; k <= N; k++) {
-        const t = k / N, a = Math.PI * (0.04 + 0.92 * t), taper = Math.min(1, Math.sin(Math.PI * t) * 3);
-        const zz = w.z + Math.cos(a) * R, yy = wy + Math.sin(a) * R;
-        const base = Math.max(F.surfX(s, zz, yy), Math.abs(w.x) + w.tw / 2 - 0.02) + 0.07 * taper - 0.004;   // body after the widening
-        for (const [o, rr] of prof) { const rad = R + rr; pos.push(base + o * taper, wy + Math.sin(a) * rad, w.z + Math.cos(a) * rad); }
+  // Each flare follows the car's REAL wheel-arch opening (measured from the body mesh around that wheel, after the
+  // widening), sits on the outer skin there and blends into the body at both ends instead of stopping as a flap.
+  if (ctx.wide && man.wheels && ctx.shell) {
+    const verts = shellVerts(ctx.shell, man.wheels);
+    man.wheels.forEach(w => {
+      const s = Math.sign(w.x), wy = w.y ?? w.r;
+      // (some models have flipped normals: then accept sideways-facing surfaces either way)
+      const arch = measureArch(verts, w, s, wy) || measureArch(verts, w, s, wy, true);
+      if (!arch) return;
+      const { k0, k1, edge, outX, NB } = arch;
+      const angle = k => Math.PI * (k + 0.5) / NB;
+      // swept profile (outward o, radial r' from the arch edge): flange on the body -> rolled outer edge -> lip
+      // reaching 1.5 cm into the opening
+      const prof = [[-0.004, 0.065], [0.012, 0.05], [0.028, 0.03], [0.036, 0.008], [0.032, -0.008], [0.016, -0.015], [-0.003, -0.015]];
+      const pos = [], idx = [], P = prof.length, span = k1 - k0;
+      const ring = [];
+      for (let k = k0; k <= k1; k++) {
+        const t = (k - k0) / span, a = angle(k);
+        const taper = THREE.MathUtils.smoothstep(Math.min(t, 1 - t), 0, 0.2);   // ends melt into the body
+        ring.push({ a, e: edge[k], x: outX[k], taper });
       }
-      const P = prof.length;
-      for (let k = 0; k < N; k++) for (let j = 0; j < P - 1; j++) { const i0 = k * P + j, i1 = i0 + P; idx.push(i0, i0 + 1, i1, i1, i0 + 1, i1 + 1); }
+      for (const r of ring) for (const [o, rr] of prof) {
+        const rad = r.e + rr * (0.35 + 0.65 * r.taper);
+        pos.push(r.x - 0.003 + o * r.taper, wy + Math.sin(r.a) * rad, w.z + Math.cos(r.a) * rad);
+      }
+      for (let k = 0; k < ring.length - 1; k++) for (let j = 0; j < P - 1; j++) { const i0 = k * P + j, i1 = i0 + P; idx.push(i0, i0 + 1, i1, i1, i0 + 1, i1 + 1); }
       const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setIndex(idx); geo.computeVertexNormals();
-      const fm = panelPaint(ctx.paint, ctx.paintTint);
-      const fl = mesh(geo, fm);
+      const fl = mesh(geo, panelPaint(ctx.paint, ctx.paintTint));
       fl.scale.x = s; g.add(fl);
-      for (let k = 1; k < 9; k++) {
-        const a = Math.PI * (0.1 + 0.8 * k / 9);
+      // rivets along the flange, only where the flare stands proud
+      for (let i = 1; i < 9; i++) {
+        const r = ring[Math.round(i / 9 * (ring.length - 1))]; if (r.taper < 0.6) continue;
+        const rad = r.e + 0.045;
         const rv = mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.006, 8), MM.rivet, false);
-        const zz = w.z + Math.cos(a) * (R + 0.04), yy = wy + Math.sin(a) * (R + 0.04);
-        rv.rotation.z = Math.PI / 2; rv.position.set(s * (Math.max(F.surfX(s, zz, yy), Math.abs(w.x) + w.tw / 2 - 0.02) + 0.07 + 0.012), wy + Math.sin(a) * (R + 0.045), w.z + Math.cos(a) * (R + 0.045)); g.add(rv);
+        rv.rotation.z = Math.PI / 2; rv.position.set(s * (r.x + 0.012 * r.taper + 0.004), wy + Math.sin(r.a) * rad, w.z + Math.cos(r.a) * rad); g.add(rv);
       }
     });
   }
@@ -1004,11 +1177,12 @@ export function addInterior(ctx) {
   if (!buckets && !stripped) return null;
   const open = spec.car.body === 'roadster' && F.roofF - F.roofR < 0.5;
   const W = F.W, zSeat = seatZ(F, open), half = Math.min(F.W * 0.42, F.sideX(zSeat, F.roofY - 0.5) - 0.12);
+  const cutHalf = Math.min(half, F.sideX(zSeat, F.roofY - 0.5) - 0.24);   // stays inside the door cards
   const floorY = Math.max(0.16, Math.min(0.45, F.lowAt(W * 0.2, zSeat) + 0.06));
   // ---- cut the original seats / rear bench / carpet (keep dash, doors, roof, glass) ----
   const zFront = Math.min(F.cowl - 0.45, Math.max(F.roofF - 0.45, zSeat + 0.4)), zBack = stripped ? F.roofR - 0.25 : zSeat - 0.45;
   const box = [
-    [new THREE.Vector3(1, 0, 0), half], [new THREE.Vector3(-1, 0, 0), half],
+    [new THREE.Vector3(1, 0, 0), cutHalf], [new THREE.Vector3(-1, 0, 0), cutHalf],
     [new THREE.Vector3(0, 0, 1), -zBack], [new THREE.Vector3(0, 0, -1), zFront],
     [new THREE.Vector3(0, 1, 0), -(floorY - 0.04)], [new THREE.Vector3(0, -1, 0), F.roofY - 0.28],
   ];
@@ -1018,7 +1192,9 @@ export function addInterior(ctx) {
   const mats = new Map();
   shell.traverse(o => {
     if (!o.isMesh) return;
-    const conv = m => { if (!mats.has(m)) { const c = m.clone(); c.clippingPlanes = world; c.clipIntersection = true; c.onBeforeCompile = m.onBeforeCompile; c.customProgramCacheKey = m.customProgramCacheKey; if (m.userData.cf) c.userData.cf = m.userData.cf; mats.set(m, c); } return mats.get(m); };
+    // never cut the glass, the painted body (door skins) or the door cards: only seats / bench / carpet go
+    const keep = m => m.userData.cf || m.transmission > 0 || (m.transparent && m.depthWrite === false) || /door|glass|window|tint/i.test(m.name);
+    const conv = m => { if (keep(m)) return m; if (!mats.has(m)) { const c = m.clone(); c.clippingPlanes = world; c.clipIntersection = true; c.onBeforeCompile = m.onBeforeCompile; c.customProgramCacheKey = m.customProgramCacheKey; if (m.userData.cf) c.userData.cf = m.userData.cf; mats.set(m, c); } return mats.get(m); };
     o.material = Array.isArray(o.material) ? o.material.map(conv) : conv(o.material);
     o.onBeforeRender = ((prev) => function (...a) { for (let i = 0; i < local.length; i++) world[i].copy(local[i]).applyMatrix4(shell.matrixWorld); prev?.apply(this, a); })(o.onBeforeRender);
   });
@@ -1144,8 +1320,10 @@ export function findOemSpoiler(scene, F, hatch, carId) {
       if (otherFirst) covered++;                     // something above it (glass over a parcel shelf, a wing over a lid)
       if (gap != null && gap < 0.25) close++;        // deck right under it (a lid has the empty trunk under it)
     }
-    if (F._dbg) F._dbg.push({ m: ([].concat(c.mesh.material)[0]?.name || '').slice(0, 20), n: c.tris.length, hitCols, close, covered, box: [c.y0, c.y1, c.z0, c.z1].map(v => +v.toFixed(2)) });
-    if (hitCols >= 3 && close >= 0.6 * hitCols && covered <= 1) out.push(c);
+    if (F._dbg) F._dbg.push({ m: ([].concat(c.mesh.material)[0]?.name || "").slice(0, 20), n: c.tris.length, hitCols, close, covered, box: [c.y0, c.y1, c.z0, c.z1].map(v => +v.toFixed(2)) });
+    // a tall factory wing (911 GT3 RS, swan necks): wide, nothing above it, well clear of the deck, at the very tail
+    const tallWing = hitCols >= 8 && covered === 0 && c.y1 < F.roofY && c.y0 > F.deckY && c.z0 < F.tail + 0.7 && c.y1 - c.y0 > 0.03 && c.x1 - c.x0 > 0.6 * F.W;
+    if ((hitCols >= 3 && close >= 0.6 * hitCols && covered <= 1) || tallWing) out.push(c);
   }
   // take the pieces that belong to it: anything entirely inside its box, and posts reaching from the deck up to it
   const take = new Set(out);

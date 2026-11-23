@@ -4,8 +4,10 @@ import { app, BrowserWindow, protocol, net, ipcMain, shell } from 'electron';
 import path from 'node:path';
 import fs from 'node:fs';
 import { pathToFileURL, fileURLToPath } from 'node:url';
+import { activeGame, checkForUpdate } from './updater.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+if (process.env.TF_USERDATA) app.setPath('userData', process.env.TF_USERDATA);   // tests: keep the real profile clean
 const SETTINGS = path.join(app.getPath('userData'), 'desktop-settings.json');
 const readSettings = () => { try { return JSON.parse(fs.readFileSync(SETTINGS, 'utf8')); } catch { return {}; } };
 const settings = { uncapped: false, ...readSettings() };
@@ -21,14 +23,17 @@ if (settings.uncapped || process.argv.includes('--uncapped')) {
 
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true, stream: true } }]);
 
-function createWindow() {
+function createWindow(game) {
   const win = new BrowserWindow({
     width: 1600, height: 940, minWidth: 1100, minHeight: 680,
     backgroundColor: '#0b0d12', title: 'TorqueForge', autoHideMenuBar: true, show: false,
     webPreferences: { preload: path.join(ROOT, 'desktop/preload.cjs'), contextIsolation: true, sandbox: true, backgroundThrottling: false },
   });
-  win.once('ready-to-show', () => win.show());
+  win.once('ready-to-show', () => { if (!process.env.TF_HIDDEN) win.show(); });
   win.loadURL('app://game/index.html');
+  // auto-update the game files (installed apps only; TF_UPDATE_URL forces it for testing)
+  if (!process.env.TF_SHOT && (app.isPackaged || process.env.TF_UPDATE_URL))
+    win.webContents.once('did-finish-load', () => checkForUpdate(ROOT, game, win));
   // external links (eBay / Shop / listings / credits) open in the system browser
   win.webContents.setWindowOpenHandler(({ url }) => { if (/^https?:/.test(url)) shell.openExternal(url); return { action: 'deny' }; });
   win.webContents.on('will-navigate', (e, url) => { if (!url.startsWith('app://')) { e.preventDefault(); shell.openExternal(url); } });
@@ -45,11 +50,14 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  const game = activeGame(ROOT);
+  console.log('[game] version', game.version, game.dir ? `(updated files in ${game.dir})` : '(as installed)');
   protocol.handle('app', req => {
     const u = new URL(req.url);
     const rel = decodeURIComponent(u.pathname).replace(/^\/+/, '') || 'index.html';
-    const file = path.normalize(path.join(ROOT, rel));
-    if (!file.startsWith(ROOT)) return new Response('forbidden', { status: 403 });
+    const base = game.dir && game.overlay.has(rel) ? game.dir : ROOT;
+    const file = path.normalize(path.join(base, rel));
+    if (!file.startsWith(base)) return new Response('forbidden', { status: 403 });
     return net.fetch(pathToFileURL(file).toString());
   });
   ipcMain.handle('tf:getUncapped', () => settings.uncapped);
@@ -59,7 +67,7 @@ app.whenReady().then(() => {
     fs.writeFileSync(SETTINGS, JSON.stringify(settings));
     app.relaunch(); app.exit(0);
   });
-  createWindow();
-  app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
+  createWindow(game);
+  app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(game); });
 });
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });

@@ -10,6 +10,7 @@ import { evaluate, emptyBuild } from './build.js';
 import { loadCarAsset, getCarAsset, hasRealModel } from './carassets.js';
 import { current as gfxQ, loadEnv } from './gfx.js';
 import { TrackScenery } from './trackscene.js';
+import { DragScene, STRIP, DRAG_MARKS, DRAG_DISTANCES, onStrip, stripEnd } from './dragscene.js';
 import { RaceControl, AIDriver, pickOpponents, fmtRace } from './race.js';
 import { Net } from './net.js';
 import { CarAudio, sfx, soundOn, setSoundOn } from './sound.js';
@@ -67,9 +68,9 @@ export class TestDrive {
       if (document.activeElement && document.activeElement !== document.body && !(e.target.tagName === 'INPUT' && e.target.type === 'text')) document.activeElement.blur();
       const k = e.key.toLowerCase();
       if (!this.keys[k]) {
-        const manual = this.car && !this.car.auto;
-        if (k === 'e' || (manual && k === 'w')) this.edgeUp = true;
-        if (k === 'q' || (manual && k === 's')) this.edgeDown = true;
+        // manual shifting: E up, Q down (W/S always drive, so WASD works in every gearbox mode)
+        if (k === 'e') this.edgeUp = true;
+        if (k === 'q') this.edgeDown = true;
         if (k === 'c') this.setCam(CAMS[(CAMS.indexOf(this.camName) + 1) % CAMS.length]);
         if (k === 'r') this.reset();
       }
@@ -98,41 +99,17 @@ export class TestDrive {
     this.world = new TrackScenery(S, this.T, { pbrTex, quality: gfxQ() });
     const gantryMat = new THREE.MeshStandardMaterial({ color: 0x222222, metalness: 0.6, roughness: 0.4 });
 
-    // drag strip
-    const D = DRAG, len = D.length + D.runoff + 40;
-    const dragMat = new THREE.MeshStandardMaterial({ map: pbrTex('asphalt_track_diff_1k.jpg', [D.width / 4, len / 4], true), normalMap: pbrTex('asphalt_track_nor_gl_1k.jpg', [D.width / 4, len / 4]),
-      roughnessMap: pbrTex('asphalt_track_rough_1k.jpg', [D.width / 4, len / 4]), roughness: 1, color: 0x9a9a9a });
-    const strip = new THREE.Mesh(new THREE.PlaneGeometry(D.width, len), dragMat);
-    strip.rotation.x = -Math.PI / 2; strip.position.set(D.x, 0.02, D.z0 - 40 + len / 2); strip.receiveShadow = true; S.add(strip);
-    const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const ln = (w, l, x, z) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, l), lineMat); m.rotation.x = -Math.PI / 2; m.position.set(x, 0.03, z); S.add(m); };
-    ln(0.2, len, D.x, D.z0 - 40 + len / 2); ln(0.2, len, D.x - D.width / 2 + 0.4, D.z0 - 40 + len / 2); ln(0.2, len, D.x + D.width / 2 - 0.4, D.z0 - 40 + len / 2);
-    ln(D.width, 0.4, D.x, D.z0); ln(D.width, 0.6, D.x, D.z0 + D.length);
-    const boards = [[18.29, '60 FT'], [100.58, '330 FT'], [201.17, '1/8 MILE'], [304.8, '1000 FT'], [402.34, '1/4 MILE']];
-    for (const [d, label] of boards) {
-      const t = canvasTex(256, 96, (g, w, h) => { g.fillStyle = '#111'; g.fillRect(0, 0, w, h); g.fillStyle = '#ffb020'; g.font = 'bold 46px system-ui'; g.textAlign = 'center'; g.fillText(label, w / 2, 64); });
-      for (const s of [-1, 1]) {
-        const b = new THREE.Mesh(new THREE.PlaneGeometry(4, 1.5), new THREE.MeshBasicMaterial({ map: t, side: THREE.DoubleSide }));
-        b.position.set(D.x + s * (D.width / 2 + 2), 2.4, D.z0 + d); b.rotation.y = s > 0 ? -Math.PI / 2 : Math.PI / 2; S.add(b);
-        const pole = new THREE.Mesh(new THREE.BoxGeometry(0.15, 1.6, 0.15), gantryMat); pole.position.set(D.x + s * (D.width / 2 + 2), 0.8, D.z0 + d); S.add(pole);
-      }
-    }
-    // christmas tree prop
-    const treeG = new THREE.Group();
-    const pole = new THREE.Mesh(new THREE.BoxGeometry(0.4, 3, 0.4), gantryMat); pole.position.y = 1.5; treeG.add(pole);
-    this.treeLights = [];
-    for (let i = 0; i < 4; i++) {
-      const m = new THREE.MeshStandardMaterial({ color: 0x222222, emissive: i === 3 ? 0x00ff44 : 0xffaa00, emissiveIntensity: 0 });
-      const b = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 8), m); b.position.set(0, 2.6 - i * 0.4, 0.25); treeG.add(b); this.treeLights.push(m);
-    }
-    treeG.position.set(D.x, 0, D.z0 + 6); treeG.rotation.y = Math.PI; S.add(treeG);
+    // drag strip: its own map, shown instead of the circuit in drag mode
+    this.dragScene = new DragScene(S, { pbrTex });
+    this.treeLights = this.dragScene.treeLights;
 
     this.mapBounds();
     this.applyWeather();
   }
   mapBounds() {
-    const T = this.T, D = DRAG;
-    const xs = T.points.map(p => p.x).concat([D.x]), zs = T.points.map(p => p.z).concat([D.z0, D.z0 + D.length + 60]);
+    if (this.mode === 'drag') { const h = (stripEnd() - STRIP.z0 + 120) / 2; this.mapB = { x0: STRIP.x - h, x1: STRIP.x + h, z0: STRIP.z0 - 100, z1: stripEnd() + 20 }; return; }
+    const T = this.T;
+    const xs = T.points.map(p => p.x), zs = T.points.map(p => p.z);
     this.mapB = { x0: Math.min(...xs) - 20, x1: Math.max(...xs) + 20, z0: Math.min(...zs) - 20, z1: Math.max(...zs) + 20 };
   }
 
@@ -173,6 +150,9 @@ export class TestDrive {
       if ($('#mode').value !== 'online' && this.net) { this.net.leave(); this.net = null; }
       this.syncRules?.();
       $('#autoDragWrap').classList.toggle('hidden', $('#mode').value !== 'drag');
+      $('#dragDistWrap').classList.toggle('hidden', $('#mode').value !== 'drag');
+      $('#trackSel').value = $('#mode').value === 'drag' ? 'drag' : this.T.id;
+      $('#trackDesc').textContent = $('#mode').value === 'drag' ? 'Two-lane strip · christmas tree start · timing at every mark' : `${(this.T.length / 1000).toFixed(2)} km · ${this.T.desc}`;
       if ($('#optSound').checked !== soundOn()) setSoundOn($('#optSound').checked);
       if (this.car) { this.car.tc = $('#optTC').checked; this.car.abs = $('#optABS').checked; this.car.esc = $('#optESC').checked; this.car.auto = $('#optAuto').checked; }
       $('#keysAuto').classList.toggle('hidden', !$('#optAuto').checked); $('#keysManual').classList.toggle('hidden', $('#optAuto').checked);
@@ -192,9 +172,18 @@ export class TestDrive {
     $('#ruleBudget').onchange = () => { setRules({ budget: +$('#ruleBudget').value }); $('#ruleBudget').blur(); };
     $('#ruleClass').onchange = () => { setRules({ cls: $('#ruleClass').value }); $('#ruleClass').blur(); };
     for (const id of ['#raceLaps', '#raceAI', '#raceSkill']) $(id).onchange = () => { this.reset(); $(id).blur(); };
-    $('#trackSel').innerHTML = Object.entries(TRACKS).map(([id, t]) => `<option value="${id}">${t.name} — ${(t.length / 1000).toFixed(1)} km</option>`).join('');
-    $('#trackSel').value = this.T.id; $('#trackDesc').textContent = `${(this.T.length / 1000).toFixed(2)} km · ${this.T.desc}`;
-    $('#trackSel').onchange = () => { this.setTrack($('#trackSel').value); $('#trackSel').blur(); };
+    $('#trackSel').innerHTML = Object.entries(TRACKS).map(([id, t]) => `<option value="${id}">${t.name} — ${(t.length / 1000).toFixed(1)} km</option>`).join('') + `<option value="drag">Drag strip — ⅛ to 1 mile</option>`;
+    $('#trackDesc').textContent = `${(this.T.length / 1000).toFixed(2)} km · ${this.T.desc}`;
+    // the drag strip is its own map: picking it switches to drag mode, picking a circuit leaves drag mode
+    $('#trackSel').onchange = () => {
+      const v = $('#trackSel').value;
+      if (v === 'drag') $('#mode').value = 'drag';
+      else { if ($('#mode').value === 'drag') $('#mode').value = 'circuit'; this.setTrack(v); }
+      upd(); this.reset(); $('#trackSel').blur();
+    };
+    $('#dragDist').innerHTML = DRAG_DISTANCES.map(([d, l]) => `<option value="${d}">${l} (${Math.round(d)} m)</option>`).join('');
+    try { const sd = localStorage.getItem('tf_dragdist'); if (sd && DRAG_DISTANCES.some(([d]) => String(d) === sd)) $('#dragDist').value = sd; else $('#dragDist').value = '402.336'; } catch (e) { $('#dragDist').value = '402.336'; }
+    $('#dragDist').onchange = () => { try { localStorage.setItem('tf_dragdist', $('#dragDist').value); } catch (e) { } this.reset(); $('#dragDist').blur(); };
     $('#camSel').onchange = () => { this.setCam($('#camSel').value); $('#camSel').blur(); };
     $('#weatherSel').value = this.wet ? 'wet' : 'dry';
     $('#weatherSel').onchange = () => { this.setWeather($('#weatherSel').value); $('#weatherSel').blur(); };
@@ -208,7 +197,7 @@ export class TestDrive {
   }
 
   start(spec) {
-    // gearbox default follows the car: manual cars start in manual (W/S shift), automatics / DCTs / EVs in auto
+    // gearbox default follows the car: manual cars start in manual (E/Q shift), automatics / DCTs / EVs in auto
     if (this.spec?.car.id !== spec.car.id || this.spec?.trans.type !== spec.trans.type) $('#optAuto').checked = spec.trans.type !== 'MT';
     this.spec = spec;
     this.net?.updateMyBuild();
@@ -336,9 +325,15 @@ export class TestDrive {
     this.drag = null;
     $('#timeslip').classList.add('hidden'); $('#tree').classList.add('hidden'); $('#msg').textContent = '';
     const T = this.T;
-    if (mode === 'drag') {
-      this.car.reset(DRAG.x - DRAG.width / 4, DRAG.z0 - 0.5, 0);
-      this.drag = { phase: 'stage', t: 0, green: null, launched: false, start: null, marks: {}, rt: null };
+    // drag strip is its own map: hide the circuit scenery, show the strip
+    const dragMap = mode === 'drag';
+    this.world.group.visible = !dragMap; this.dragScene.group.visible = dragMap;
+    this.mapBounds();
+    if (dragMap) {
+      this.dragDist = +($('#dragDist')?.value || 402.336);
+      this.dragScene.setDistance(this.dragDist);
+      this.car.reset(STRIP.x - STRIP.width / 4, STRIP.z0 - 0.5, 0);
+      this.drag = { phase: 'stage', t: 0, green: null, launched: false, start: null, marks: {}, rt: null, finish: null };
       $('#tree').classList.remove('hidden');
     } else {
       const i0 = T.N - 25, p = T.points[i0];
@@ -431,9 +426,8 @@ export class TestDrive {
   // ---------------- per frame ----------------
   input() {
     const k = this.keys;
-    // manual gearbox: arrows drive, W/S shift (handled on keydown); automatic: W/S or arrows drive
-    const manual = this.car && !this.car.auto;
-    let thr = ((!manual && k['w']) || k['arrowup']) ? 1 : 0, brk = ((!manual && k['s']) || k['arrowdown']) ? 1 : 0;
+    // W/S or arrows drive in every mode; manual shifts on E/Q (handled on keydown)
+    let thr = (k['w'] || k['arrowup']) ? 1 : 0, brk = (k['s'] || k['arrowdown']) ? 1 : 0;
     const left = (k['a'] || k['arrowleft']) ? 1 : 0, right = (k['d'] || k['arrowright']) ? 1 : 0;
     let target = left - right;
     let hb = !!k[' '];
@@ -477,7 +471,7 @@ export class TestDrive {
     return r;
   }
   surfaceDry(x, z, hint = -1) {
-    if (Math.abs(x - DRAG.x) < DRAG.width / 2 && z > DRAG.z0 - 40 && z < DRAG.z0 + DRAG.length + DRAG.runoff) return { muMul: 1, rrExtra: 0, on: true };
+    if (this.mode === 'drag') return onStrip(x, z) ? { muMul: 1, rrExtra: 0, on: true } : { muMul: 0.6, rrExtra: 0.045, on: false };
     const n = nearest(this.T, x, z, hint);
     if (n.d < this.T.width / 2 + 1.3) return { muMul: 1, rrExtra: 0, on: true, n };
     const A = this.world.A;
@@ -506,7 +500,9 @@ export class TestDrive {
       const D = this.drag;
       D.t += dt;
       const auto = $('#optAutoDrag').checked;
-      if (auto) inp = { throttle: D.phase === 'done' ? 0 : 1, brake: D.phase === 'done' ? 1 : 0, steer: -car.yaw * 2 - (car.x - (DRAG.x - DRAG.width / 4)) * 0.05 };
+      if (auto) inp = { throttle: D.phase === 'done' ? 0 : 1, brake: D.phase === 'done' ? 1 : 0, steer: -car.yaw * 2 - (car.x - (STRIP.x - STRIP.width / 4)) * 0.05,
+        // the pro driver shifts a manual box too: right at the limiter
+        shiftUp: !car.auto && D.phase === 'run' && car.rpm > car.eng.redline * 0.97 && !(car.shiftTimer > 0) && car.gear < car.gears.length };
       if (D.phase === 'stage') {
         hold = true;
         const tt = D.t - 1.0;
@@ -519,14 +515,15 @@ export class TestDrive {
         car.launchRpm = Math.max(car.eng.idle + 400, car.rpm);
       } else {
         if (D.rt == null && inp.throttle > 0.5) D.rt = D.t - D.green;
-        const dist = car.z - DRAG.z0;
+        const dist = car.z - STRIP.z0;
         if (D.start == null && dist > 0.3) D.start = car.time;
         if (D.start != null) {
           const et = car.time - D.start;
-          for (const [d, key] of [[18.29, 'ft60'], [100.58, 'ft330'], [201.17, 'eighth'], [304.8, 'ft1000'], [402.34, 'quarter']]) {
-            if (!D.marks[key] && dist >= d) D.marks[key] = { t: et - (dist - d) / Math.max(1, car.u), v: car.u }; // interpolate to the beam
+          for (const [d, key] of DRAG_MARKS) {
+            if (d <= this.dragDist + 0.5 && !D.marks[key] && dist >= d) D.marks[key] = { t: et - (dist - d) / Math.max(1, car.u), v: car.u }; // interpolate to the beam
           }
-          if (D.marks.quarter && D.phase !== 'done') { D.phase = 'done'; this.showTimeslip(); $('#tree').classList.add('hidden'); }
+          if (!D.finish && dist >= this.dragDist) D.finish = { t: et - (dist - this.dragDist) / Math.max(1, car.u), v: car.u };
+          if (D.finish && D.phase !== 'done') { D.phase = 'done'; this.dragScene.win(true); this.showTimeslip(); $('#tree').classList.add('hidden'); }
         }
         if (car.gear > 1 || car.u > 15) car.launchRpm = null;
       }
@@ -543,8 +540,17 @@ export class TestDrive {
     const surf = this.surface(car.x, car.z);
     let n = 0;
     while (this.acc >= DT && n < 40) {
-      if (!hold) car.step(DT, inp, { wind, dirty, muMul: surf.muMul, rrExtra: surf.rrExtra, noReverse: mode === 'drag', height: this.T.heightAt });
+      if (!hold) car.step(DT, inp, { wind, dirty, muMul: surf.muMul, rrExtra: surf.rrExtra, noReverse: mode === 'drag', height: mode === 'drag' ? null : this.T.heightAt });
       inp.shiftUp = inp.shiftDown = false;
+      if (mode === 'drag' && car.z > STRIP.z0 - STRIP.back && car.z < stripEnd()) {
+        // strip walls: bounce off and straighten up (the lanes are walled in on both sides)
+        const lim = STRIP.width / 2 - 0.65 - this.model.dims.W / 2, off = car.x - STRIP.x;
+        if (Math.abs(off) > lim) {
+          const hard = Math.abs(car.v) + Math.abs(car.u * Math.sin(car.yaw));
+          car.x = STRIP.x + Math.sign(off) * lim; car.v *= -0.25; car.r *= 0.3; car.yaw *= 0.6; car.u *= hard > 3 ? 0.85 : 0.98;
+          if (hard > 3) this.shake = Math.min(0.6, (this.shake || 0) + hard * 0.03);
+        }
+      }
       if (mode !== 'drag') {
         let hit = collideWalls(car, this.model.dims, this.world, this.T, this.idx, nearest);
         const R = this.rival;
@@ -572,7 +578,7 @@ export class TestDrive {
 
     // model sync
     const M = this.model;
-    poseOnGround(this.T, M.root, car.x, car.z, car.yaw);
+    poseOnGround(this.groundT(), M.root, car.x, car.z, car.yaw);
     M.body.rotation.x += ((-car.axs * 0.006) - M.body.rotation.x) * Math.min(1, dt * 8);
     M.body.rotation.z += ((car.ays * 0.007) - M.body.rotation.z) * Math.min(1, dt * 8);
     car.wheels.forEach((w, i) => {
@@ -707,16 +713,15 @@ export class TestDrive {
     const r = D.marks;
     $('#timeslip').innerHTML = `<h4>TIMESLIP</h4><table>
       <tr><td>Reaction</td><td>${(D.rt ?? 0).toFixed(3)}</td></tr>
-      <tr><td>60 ft</td><td>${r.ft60.t.toFixed(3)}</td></tr>
-      <tr><td>330 ft</td><td>${r.ft330.t.toFixed(3)}</td></tr>
-      <tr><td>1/8 mile</td><td>${r.eighth.t.toFixed(3)} @ ${mph(r.eighth.v)} mph</td></tr>
-      <tr><td>1000 ft</td><td>${r.ft1000.t.toFixed(3)}</td></tr>
-      <tr><td><b>1/4 mile</b></td><td><b>${r.quarter.t.toFixed(3)} @ ${mph(r.quarter.v)} mph</b></td></tr>
+      ${DRAG_MARKS.filter(([d, k]) => r[k] && d < this.dragDist - 0.5).map(([d, k, l]) => `<tr><td>${l}</td><td>${r[k].t.toFixed(3)}${d >= 200 ? ` @ ${mph(r[k].v)} mph` : ''}</td></tr>`).join('')}
+      <tr><td><b>${this.dragLabel()}</b></td><td><b>${D.finish.t.toFixed(3)} @ ${mph(D.finish.v)} mph</b></td></tr>
       </table><div style="text-align:center;margin-top:6px;color:#8b93a5;font-size:12px">${this.spec.car.make} ${this.spec.car.model} · ${Math.round(this.spec.engine.hp)} hp · ${Math.round(this.spec.mass)} kg · Press R to run again</div>`;
     $('#timeslip').classList.remove('hidden');
   }
 
-  gh(x, z) { return this.T.heightAt ? this.T.heightAt(x, z) : 0; }
+  gh(x, z) { return this.mode !== 'drag' && this.T.heightAt ? this.T.heightAt(x, z) : 0; }
+  groundT() { return this.mode === 'drag' ? FLAT : this.T; }
+  dragLabel() { return DRAG_DISTANCES.find(([d]) => Math.abs(d - this.dragDist) < 1)?.[1] || `${Math.round(this.dragDist)} m`; }
   setCam(name) {
     this.camName = name; this.camPos = null;
     try { localStorage.setItem('tf_cam', name); } catch (e) { }
@@ -744,6 +749,14 @@ export class TestDrive {
       return;
     }
     this.cam.near = 0.1;
+    if (name === 'tv' && this.mode === 'drag') {
+      // trackside cameras every 150 m along the spectator side of the strip
+      const k = Math.max(0, Math.round((car.z - STRIP.z0 + 40) / 150));
+      this.tvPos = new THREE.Vector3(STRIP.x - STRIP.width / 2 - 9, 7, STRIP.z0 + k * 150 + 40);
+      this.cam.position.copy(this.tvPos); this.cam.lookAt(car.x, 0.8, car.z);
+      setFov(Math.max(8, Math.min(55, 2 * Math.atan(9 / this.tvPos.distanceTo(new THREE.Vector3(car.x, 0.8, car.z))) * 180 / Math.PI)));
+      return;
+    }
     if (name === 'tv') {
       // nearest trackside camera tower, zooming to keep the car a similar size on screen
       const T = this.T, A = this.world.A, step = 55;
@@ -806,8 +819,8 @@ export class TestDrive {
       }
     } else {
       const D = this.drag;
-      const et = D.start != null && !D.marks.quarter ? car.time - D.start : D.marks.quarter?.t;
-      $('#hudTL').innerHTML = `<div class="big">${et != null ? et.toFixed(3) : '0.000'}</div><div>Distance: ${Math.max(0, car.z - DRAG.z0).toFixed(0)} m / 402 m</div>`;
+      const et = D.start != null && !D.finish ? car.time - D.start : D.finish?.t;
+      $('#hudTL').innerHTML = `<div class="big">${et != null ? et.toFixed(3) : '0.000'}</div><div>${this.dragLabel()} · ${Math.max(0, Math.min(this.dragDist, car.z - STRIP.z0)).toFixed(0)} m / ${Math.round(this.dragDist)} m</div>`;
     }
     const sf = this.secFlash && car.time < this.secFlash.until ? this.secFlash : null;
     $('#hudTC').innerHTML = (surf.on ? '' : '<span class="pill dirty">OFF TRACK</span>') +
@@ -820,9 +833,13 @@ export class TestDrive {
     const sc = Math.min((W - 20) / (B.x1 - B.x0), (W - 20) / (B.z1 - B.z0));
     const X = x => 10 + (x - B.x0) * sc, Y = z => 10 + (z - B.z0) * sc;
     g.clearRect(0, 0, W, W);
-    g.strokeStyle = '#ccc'; g.lineWidth = 3; g.beginPath();
-    this.T.points.forEach((p, i) => i ? g.lineTo(X(p.x), Y(p.z)) : g.moveTo(X(p.x), Y(p.z))); g.closePath(); g.stroke();
-    g.strokeStyle = '#777'; g.beginPath(); g.moveTo(X(DRAG.x), Y(DRAG.z0)); g.lineTo(X(DRAG.x), Y(DRAG.z0 + DRAG.length + DRAG.runoff)); g.stroke();
+    if (this.mode === 'drag') {
+      g.strokeStyle = '#ccc'; g.lineWidth = 6; g.beginPath(); g.moveTo(X(STRIP.x), Y(STRIP.z0 - STRIP.back)); g.lineTo(X(STRIP.x), Y(stripEnd())); g.stroke();
+      g.strokeStyle = '#ffb020'; g.lineWidth = 2; g.beginPath(); g.moveTo(X(STRIP.x) - 8, Y(STRIP.z0 + this.dragDist)); g.lineTo(X(STRIP.x) + 8, Y(STRIP.z0 + this.dragDist)); g.stroke();
+    } else {
+      g.strokeStyle = '#ccc'; g.lineWidth = 3; g.beginPath();
+      this.T.points.forEach((p, i) => i ? g.lineTo(X(p.x), Y(p.z)) : g.moveTo(X(p.x), Y(p.z))); g.closePath(); g.stroke();
+    }
     if (this.mode === 'pace' && this.rival) { g.fillStyle = '#7fd3ff'; g.beginPath(); g.arc(X(this.rival.x), Y(this.rival.z), 4, 0, 7); g.fill(); }
     const RR = this.race || this.net?.race;
     if (RR) for (const e of RR.entries) if (!e.isPlayer && e.car) { g.fillStyle = e.remote ? '#7CFC9A' : '#7fd3ff'; g.beginPath(); g.arc(X(e.car.x), Y(e.car.z), 3.5, 0, 7); g.fill(); }
@@ -831,4 +848,5 @@ export class TestDrive {
   }
 }
 
+const FLAT = {};   // ground for poseOnGround on the (flat) drag strip map
 function fmtLap(t) { const m = Math.floor(t / 60); return `${m}:${(t - m * 60).toFixed(2).padStart(5, '0')}`; }

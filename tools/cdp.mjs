@@ -1,12 +1,14 @@
 // Minimal headless-Chrome driver for smoke tests: node tools/cdp.mjs <url> <script.json>
 // script: [{eval: "js"}, {wait: ms}, {shot: "file.png"}, {key: "w", down: true}]
 import { spawn } from 'node:child_process';
-import { writeFileSync, readFileSync } from 'node:fs';
+import fs, { writeFileSync, readFileSync } from 'node:fs';
+import os from 'node:os';
 const [url, scriptFile, outDir = '.'] = process.argv.slice(2);
 const steps = JSON.parse(readFileSync(scriptFile, 'utf8'));
 const port = +(process.env.CDP_PORT || 9333);
+const PROF = fs.mkdtempSync(os.tmpdir() + '/tf-chrome-');
 const chrome = spawn('google-chrome', ['--headless=new', `--remote-debugging-port=${port}`, '--mute-audio', '--no-first-run', '--no-default-browser-check',
-  '--user-data-dir=' + outDir + '/chrome-prof-' + Date.now(), '--window-size=1600,900', ...(process.env.CDP_GPU ? ['--use-angle=vulkan', '--enable-features=Vulkan', '--ignore-gpu-blocklist', '--enable-gpu-rasterization', '--disable-frame-rate-limit', '--disable-gpu-vsync'] : ['--enable-unsafe-swiftshader', '--use-angle=swiftshader']), 'about:blank'], { stdio: 'ignore' });
+  '--user-data-dir=' + PROF, '--window-size=1600,900', ...(process.env.CDP_GPU ? ['--use-angle=vulkan', '--enable-features=Vulkan', '--ignore-gpu-blocklist', '--enable-gpu-rasterization', '--disable-frame-rate-limit', '--disable-gpu-vsync'] : ['--enable-unsafe-swiftshader', '--use-angle=swiftshader']), 'about:blank'], { stdio: 'ignore' });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let ws, id = 0; const pend = new Map();
 for (let i = 0; i < 50; i++) { try { const r = await fetch(`http://127.0.0.1:${port}/json/list`); const j = await r.json(); const pg = j.find(t => t.type === 'page'); if (pg) { ws = new WebSocket(pg.webSocketDebuggerUrl); break; } } catch (e) { } await sleep(200); }
@@ -26,4 +28,5 @@ for (const st of steps) {
   if (st.shot) { const r = await send('Page.captureScreenshot', { format: 'png' }); writeFileSync(outDir + '/' + st.shot, Buffer.from(r.result.data, 'base64')); console.log('[shot]', st.shot); }
 }
 ws.close(); chrome.kill();
+await new Promise(r => setTimeout(r, 400)); try { fs.rmSync(PROF, { recursive: true, force: true }); } catch {}
 process.exit(0);

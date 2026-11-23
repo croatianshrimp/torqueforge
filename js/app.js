@@ -2,7 +2,7 @@ import * as THREE from '../vendor/three.module.js';
 import { OrbitControls } from '../vendor/OrbitControls.js';
 import { RoomEnvironment } from '../vendor/RoomEnvironment.js';
 import { FAMILIES, familyOf, CARS, CAR_BY_ID, SWAPS, PARTS, WHEELS, TIRES, CATEGORIES, CAT_BY_ID, PRICE_NOTE, totalPartCount, stockWheel, stockTire } from './data.js';
-import { evaluate, emptyBuild, getPart, candidateCheck, matchTires, migrateSel, swapNeeds, resolveNeeds, TUNE_DEFAULTS, tuneLimits } from './build.js';
+import { adaptTrans, evaluate, emptyBuild, getPart, candidateCheck, matchTires, migrateSel, swapNeeds, resolveNeeds, TUNE_DEFAULTS, tuneLimits } from './build.js';
 import { fullStats, dynoCurve } from './physics.js';
 import { DynoRun } from './dyno.js';
 import { sfx, loopHum, engineVoice, soundOn } from './sound.js';
@@ -733,7 +733,8 @@ function renderPickList() {
   let rows = checked.filter(r => (!compatOnly || r.level !== 'error') &&
     (!q || `${r.p.brand} ${r.p.name}`.toLowerCase().includes(q)) &&
     (!fDia || String(r.p.dia) === fDia) && (!fModel || r.p.model === fModel));
-  const key = { price: r => r.p.price, '-price': r => -r.p.price, name: r => 0, perf: r => -perfScore(cat, r.p) }[sort];
+  const kg = p => p.mass ?? p.wheelMass ?? p.tireMass ?? 0;   // part weight (kg; weight-reduction parts are negative)
+  const key = { price: r => r.p.price, '-price': r => -r.p.price, name: r => 0, perf: r => -perfScore(cat, r.p), mass: r => kg(r.p), '-mass': r => -kg(r.p) }[sort];
   rows.sort((a, b) => (a.p.stock ? -1 : 0) - (b.p.stock ? -1 : 0) || (sort === 'name' ? `${a.p.brand} ${a.p.name}`.localeCompare(`${b.p.brand} ${b.p.name}`) : key(a) - key(b)));
   const total = rows.length;
   rows = rows.slice(0, 150);
@@ -800,6 +801,13 @@ function choose(cat, id) {
   if (adding) {
     const r = candidateCheck(sel, cat, id);
     if (r.level === 'error') { if (soundOn()) sfx.remove?.(); toast(`Can't install: ${r.msgs[0] || 'not compatible with this build'}`); return; }
+  }
+  if (cat === 'gearbox') {
+    const a = adaptTrans(sel, id), msgs = [];
+    if (a.trans !== sel.trans) msgs.push(a.trans ? `clutch swapped to the matching ${PARTS.find(q => q.id === a.trans)?.name}` : 'clutch upgrade removed (doesn\'t fit this gearbox)');
+    if ((a.driveline || []).length !== (sel.driveline || []).length) msgs.push('short shifter / light flywheel removed (manual only)');
+    sel.trans = a.trans; sel.driveline = a.driveline;
+    if (msgs.length) toast(msgs.join(' · ').replace(/^./, c => c.toUpperCase()));
   }
   if (c.multi) {
     const arr = sel[cat] || [];
@@ -875,7 +883,7 @@ function openCarPicker() {
 function renderCarGrid() {
   const q = $('#carSearch').value.toLowerCase(), dr = $('#carDrive').value, so = $('#carSort').value;
   let list = CARS.filter(c => (!q || `${c.make} ${c.model} ${c.engine.name}`.toLowerCase().includes(q)) && (!dr || c.drive === dr));
-  const k = { price: c => c.price, '-price': c => -c.price, '-hp': c => -c.engine.hp, make: c => 0 }[so];
+  const k = { price: c => c.price, '-price': c => -c.price, '-hp': c => -c.engine.hp, mass: c => c.mass, '-mass': c => -c.mass, make: c => 0 }[so];
   const lineKey = c => { const f = familyOf(c.id); return f ? `${FAMILIES.indexOf(f).toString().padStart(3, '0')}${f.ids.indexOf(c.id)}` : `999${c.make}${c.model}`; };
   if (so === 'line') list.sort((a, b) => lineKey(a).localeCompare(lineKey(b)));
   else list.sort((a, b) => so === 'make' ? `${a.make}${a.model}`.localeCompare(`${b.make}${b.model}`) : k(a) - k(b));

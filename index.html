@@ -97,7 +97,7 @@
         <option value="attack">Time attack (medals)</option>
         <option value="race">Race vs AI</option>
         <option value="pace">Chase the pace car</option>
-        <option value="drag">Drag strip (¼ mile)</option>
+        <option value="drag">Drag strip</option>
         </optgroup>
         <optgroup label="Multiplayer">
         <option value="online">Online with friends</option>
@@ -121,6 +121,7 @@
       <label>Pace <span id="paceVal">85%</span><input type="range" id="pace" min="0.5" max="1.0" step="0.01" value="0.85"></label>
     </div>
     <label>Track <select id="trackSel"></select><small id="trackDesc" class="muted"></small></label>
+    <label id="dragDistWrap" class="hidden">Drag distance <select id="dragDist"></select></label>
     <label>Weather <select id="weatherSel"><option value="dry">☀️ Dry</option><option value="wet">🌧️ Wet — rain (≈28% less grip)</option></select></label>
     <label>Camera (C) <select id="camSel">
       <option value="chase">Chase</option><option value="far">Chase — far</option><option value="cockpit">Cockpit</option>
@@ -140,7 +141,7 @@
     <div class="keys">
       <b>Controls</b><br>
       <span id="keysAuto">W / ↑ throttle · S / ↓ brake / reverse<br></span>
-      <span id="keysManual" class="hidden">↑ throttle · ↓ brake · W shift up · S shift down<br></span>
+      <span id="keysManual" class="hidden">W / ↑ throttle · S / ↓ brake · <b>E shift up · Q shift down</b><br></span>
       A D / ← → steer · Space handbrake<br>
       C camera · R restart · Gamepad supported
     </div>
@@ -161,7 +162,7 @@
     <div class="dr-tools">
       <input id="pickSearch" placeholder="Search parts…">
       <span id="pickFilters"></span>
-      <select id="pickSort"><option value="perf">Best performance</option><option value="price">Price ↑</option><option value="-price">Price ↓</option><option value="name">Name</option></select>
+      <select id="pickSort"><option value="perf">Best performance</option><option value="price">Price ↑</option><option value="-price">Price ↓</option><option value="name">Name</option><option value="mass">Weight ↑</option><option value="-mass">Weight ↓</option></select>
       <label class="chk"><input type="checkbox" id="pickCompat" checked> Compatible only</label>
     </div>
   </div>
@@ -176,7 +177,7 @@
       <h3>Choose a base car</h3>
       <input id="carSearch" placeholder="Search make / model…">
       <select id="carDrive"><option value="">All drivetrains</option><option>RWD</option><option>FWD</option><option>AWD</option></select>
-      <select id="carSort"><option value="price">Price ↑</option><option value="-price">Price ↓</option><option value="-hp">Power ↓</option><option value="make">Make</option><option value="line">Model line (generations)</option></select>
+      <select id="carSort"><option value="price">Price ↑</option><option value="-price">Price ↓</option><option value="-hp">Power ↓</option><option value="mass">Weight ↑</option><option value="-mass">Weight ↓</option><option value="make">Make</option><option value="line">Model line (generations)</option></select>
       <button class="close" data-close>✕</button>
     </div>
     <div id="carGrid"></div>

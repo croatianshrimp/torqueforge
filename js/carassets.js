@@ -44,7 +44,7 @@ export function loadCarAsset(id, lod = 'high') {
 }
 
 const GLASS = /glass|window|windscreen|windshield|vidro|cristal|scheibe/i;
-const isGlass = m => (m.transmission > 0) || (GLASS.test(m.name) && !/light|lamp|lens|mirror|tail|head/i.test(m.name)) || (m.transparent && m.opacity < 0.7 && !/light|lamp|lens/i.test(m.name));
+const isGlass = m => (m.transmission > 0) || (GLASS.test(m.name) && !/light|lamp|lens|mirror|tail|head/i.test(m.name)) || (m.transparent && m.opacity < 0.7 && !/light|lamp|lens|opaque|interior|stitch|alcantara|leather|carpet|seat|trim/i.test(m.name));
 
 // Deep-ish clone: share geometry + most materials, but give this instance its own paint + tail-light materials.
 export function instantiateCar(entry, { paint = null, quality, paintMats: bodyPaint = null } = {}) {

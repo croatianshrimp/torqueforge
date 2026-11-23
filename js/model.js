@@ -359,7 +359,7 @@ function createRealCar(spec, asset, opts, quality) {
   const panels = [['cfhood', 'hood'], ['cftrunk', 'trunk'], ['cfroof', 'roof'], ['cfdoors', 'doors']].filter(([id]) => spec.parts.some(p => p.id === id)).map(([, n]) => n);
   const sel = spec.sel || {};
   if (sel.finish) for (const m of inst.paintMats) applyFinish(m, sel.finish, quality);
-  applyCarbonPanels(inst.paintMats, shell, F, man, panels, { stripes: sel.stripes, stripeColor: sel.stripeColor, fourDoor: car.body === 'sedan' });
+  applyCarbonPanels(inst.paintMats, shell, F, man, panels, { stripes: sel.stripes, stripeColor: sel.stripeColor, fourDoor: car.body === 'sedan', midRear: car.layout !== 'F' });
   shell.position.set(0, lift, dz);
   body.add(shell);
   const prof = man.profile, NB = prof.top.length;

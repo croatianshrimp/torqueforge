@@ -1,7 +1,7 @@
 {
   "name": "torqueforge",
   "productName": "TorqueForge",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Car builder and physics test track",
   "main": "desktop/main.js",
   "private": true,
