@@ -53,6 +53,6 @@ if (dry) { console.log('dry run: not committing or uploading'); process.exit(0);
 run('git', ['add', '-A']);
 run('git', ['commit', '-m', `TorqueForge ${version}: ${notes.split('\n')[0]}`]);
 run('git', ['tag', tag]);
-run('git', ['push', 'origin', 'HEAD', tag]);
+run('git', ['-c', 'credential.helper=', '-c', 'credential.helper=!gh auth git-credential', 'push', 'origin', 'HEAD', tag]);
 run('gh', ['release', 'create', tag, '--title', `TorqueForge ${version}`, '--notes', notes, ...assets]);
 console.log(`released ${tag}`);
